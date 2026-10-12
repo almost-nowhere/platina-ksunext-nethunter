@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NetHunter</string>
+    <string name="app_nav_home_label">NetHunter</string>
+    <string name="hometitle">系统信息</string>
+    <string name="nethunter_current_interfaces">网络接口</string>
+    <string name="nethunter_external_ip">外部 IP</string>
+    <string name="nethunter_hid_detect">HID 接口</string>
+    <string name="nethunter_busybox_detect">BusyBox 版本</string>
+    <string name="nethunter_kernelver_detect">内核版本</string>
+    <string name="nethunter_terminal_detect">NetHunter 终端状态</string>
+    <string name="nethunter_system_information">系统信息</string>
+    <string name="unknown">未知</string>
+    <string name="statusText">状态：</string>
+
+    <!-- Navigation drawer -->
+    <string name="drawertitlenethunter">主页</string>
+    <string name="drawertitlecreatechroot">Kali Chroot 管理器</string>
+    <string name="drawertitlecheckupdate">检查应用更新</string>
+    <string name="drawertitlekaliservices">Kali 服务</string>
+    <string name="drawertitlecustomcommands">自定义命令</string>
+    <string name="drawertitlemacchanger">MAC 地址修改器</string>
+    <string name="drawertitlevncmanager">KeX 管理器</string>
+    <string name="drawertitleaudio">音频管理器</string>
+    <string name="drawertitlehid">HID 攻击</string>
+    <string name="drawertitleduckhunter">DuckHunter HID</string>
+    <string name="drawertitlebadusb">BadUSB MITM 攻击</string>
+    <string name="drawertitlewifipumpkin">Wifipumpkin</string>
+    <string name="drawertitlewps">WPS 攻击</string>
+    <string name="drawertitlebt">蓝牙工具集</string>
+    <string name="drawertitlenmap">Nmap 扫描</string>
+    <string name="drawertitlempc">Metasploit 有效载荷生成器</string>
+    <string name="drawertitlesearchsploit">SearchSploit</string>
+    <string name="drawertitlepineapple">Pineapple 连接器</string>
+    <string name="drawertitlegps">无线侦测</string>
+    <string name="drawertitlecan">CARsenal</string>
+    <string name="drawertitlesettings">设置</string>
+    <string name="drawertitlekernel">内核</string>
+    <string name="drawertitlemodules">模块</string>
+    <string name="drawertitleset">SET</string>
+    <string name="drawertitleterminal">终端</string>
+    <string name="drawertitleeviltwin">恶意双胞胎</string>
+
+    <!-- Common actions -->
+    <string name="update">更新</string>
+    <string name="load">加载</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="nethunter_refresh">刷新</string>
+    <string name="nethunter_add">添加</string>
+    <string name="nethunter_delete">删除</string>
+    <string name="nethunter_move">移动</string>
+    <string name="execute_attack">执行攻击</string>
+    <string name="source">编辑源</string>
+    <string name="InstallAndUpdateButtonText">安装与更新</string>
+
+    <!-- Kali/chroot -->
+    <string name="thechroottitle">Kali chroot</string>
+    <string name="installkalichrootbutton">安装 Kali Chroot</string>
+    <string name="removekalichrootbutton">删除 Chroot</string>
+    <string name="MaintainChrootInTerminal">添加元软件包</string>
+    <string name="existingchrootfound">已发现现有 Kali chroot 目录！</string>
+    <string name="nokalichrootfound">未发现 Kali chroot 目录。</string>
+    <string name="reallyremovechroot">确定删除 chroot 吗？</string>
+    <string name="rebootbutton">重启并删除 chroot</string>
+    <string name="chickenoutbutton">取消</string>
+    <string name="extractinganddeploying">正在解压并部署</string>
+    <string name="installing_notice">正在安装 Chroot…</string>
+    <string name="extract_chroot">正在解压并部署 Chroot…（约 5–10 分钟）</string>
+    <string name="toastdeletingchroot">正在删除 Kali chroot…</string>
+    <string name="toastdeletedchroot">Kali chroot 已删除。</string>
+    <string name="toastmigratingchroot">正在迁移 Kali chroot…</string>
+    <string name="toastmigratedchroot">Kali chroot 已迁移。</string>
+
+    <!-- Root and terminal -->
+    <string name="rootdialogtitle">缺少 root/BusyBox</string>
+    <string name="rootdialogposbutton">重试</string>
+    <string name="rootdialognegbutton">退出</string>
+    <string name="terminal_hint_enter_command">输入命令</string>
+    <string name="terminal_send_cmd">发送</string>
+    <string name="terminal_send_command_desc">发送命令</string>
+    <string name="launch_kali_menu">在终端中启动 Kali 菜单</string>
+    <string name="launch_kali_shell">在终端中启动 Kali Shell</string>
+    <string name="launch_wifite">启动 Wifite</string>
+    <string name="update_kali_chroot">更新 Kali chroot</string>
+
+    <!-- Frequently used feature screens -->
+    <string name="drawertitleusbarsenal">USB 工具集</string>
+    <string name="usbarsenal_header">USB 功能选择器</string>
+    <string name="usbarsenal_enabledfunctions">当前启用的 USB 功能：</string>
+    <string name="usbarsenal_nofunctionsenabled">当前未启用 USB 功能</string>
+    <string name="usbarsenal_imagemounter_header">镜像挂载器</string>
+    <string name="usbarsenal_networktethering_header">USB 网络共享</string>
+    <string name="start_badusb">启动 BadUSB 攻击</string>
+    <string name="stop_badusb">停止 BadUSB 攻击</string>
+    <string name="reset_usb">重置 USB</string>
+    <string name="iface">接口</string>
+    <string name="loading_service">正在加载服务状态</string>
+    <string name="get_external_ip">获取外部 IP</string>
+    <string name="interface_select">选择接口：</string>
+    <string name="macchanger_select">选择 MAC 修改模式：</string>
+    <string name="reset_mac">重置 wlan0 MAC 地址</string>
+    <string name="currentmac">当前 MAC：</string>
+    <string name="changeMAC">修改 MAC</string>
+    <string name="resetMAC">重置 MAC</string>
+    <string name="randomMAC">随机 MAC</string>
+    <string name="customMAC">自定义 MAC</string>
+    <string name="searchsploit_searchbar">搜索漏洞利用</string>
+    <string name="nmap_ports">端口</string>
+    <string name="nmap_udpscan">UDP 扫描</string>
+    <string name="nmap_ipv6">启用 IPv6</string>
+    <string name="nmap_fastmode">快速模式（较少端口）</string>
+    <string name="nmap_osdetectenable">启用操作系统识别</string>
+    <string name="nmap_servicedetect">服务/版本识别</string>
+
+    <!-- Settings and status -->
+    <string name="select_language">语言</string>
+    <string name="new_app_build_detected">检测到新的应用构建：</string>
+    <string name="copying_new_files">正在复制新文件…</string>
+    <string name="drawer_opened">导航栏已打开</string>
+    <string name="drawer_closed">导航栏已关闭</string>
+    <string name="attack_launched">攻击已启动！</string>
+    <string name="toast_error_permissions">NetHunter 应用没有向 NetHunter Terminal 发送命令的权限！</string>
+    <string name="toast_install_terminal">启动失败，请安装 Android Terminal！</string>
+</resources>

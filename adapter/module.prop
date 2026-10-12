@@ -1,0 +1,7 @@
+id=nethunter
+name=Kali NetHunter (KernelSU Adapter)
+version=1.4.0-ksu1
+versionCode=14001
+author=Kali NetHunter Team; KernelSU adapter for platina
+description=Installs the official Kali NetHunter 2026.2 generic ARM64 full image through KernelSU without Magisk.
+

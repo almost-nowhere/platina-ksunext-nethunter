@@ -1,0 +1,61 @@
+diff --git a/build.gradle b/build.gradle
+index e97315a..8c889bd 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -9,6 +9,9 @@ apply plugin: 'com.android.application'
+ 
+ buildscript {
+     repositories {
++        // Mirror for environments where Gradle's TLS client cannot reliably
++        // negotiate with dl.google.com. It mirrors Google Maven artifacts.
++        maven { url "https://maven.aliyun.com/repository/google" }
+         google()
+         mavenCentral()
+         maven { url "https://chaquo.com/maven" }
+@@ -20,6 +23,7 @@ buildscript {
+ }
+ 
+ repositories {
++    maven { url "https://maven.aliyun.com/repository/google" }
+     google()
+     mavenCentral()
+     maven { url "https://repo.grails.org/grails/plugins" }
+diff --git a/src/com/offsec/nethunter/AppNavHomeActivity.java b/src/com/offsec/nethunter/AppNavHomeActivity.java
+index 7891835..3ff1b68 100644
+--- a/src/com/offsec/nethunter/AppNavHomeActivity.java
++++ b/src/com/offsec/nethunter/AppNavHomeActivity.java
+@@ -563,7 +563,15 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
+         mDrawerLayout.addDrawerListener(mDrawerToggle);
+         mDrawerToggle.syncState();
+ 
+-        startService(new Intent(getApplicationContext(), CompatCheckService.class));
++        // Android 8+ rejects a normal background-service start when an
++        // activity is temporarily paused (for example by a permission dialog
++        // or an adb launch). Compatibility checking is optional, so do not
++        // let that framework restriction crash the NetHunter UI.
++        try {
++            startService(new Intent(getApplicationContext(), CompatCheckService.class));
++        } catch (IllegalStateException e) {
++            Log.w(TAG, "Skipping deferred compatibility check", e);
++        }
+ 
+         if (desiredFragment != -1) {
+             changeDrawer(desiredFragment);
+diff --git a/src/com/offsec/nethunter/Executor/CopyBootFilesExecutor.java b/src/com/offsec/nethunter/Executor/CopyBootFilesExecutor.java
+index f6202b4..3a8bf53 100644
+--- a/src/com/offsec/nethunter/Executor/CopyBootFilesExecutor.java
++++ b/src/com/offsec/nethunter/Executor/CopyBootFilesExecutor.java
+@@ -342,6 +342,13 @@ public class CopyBootFilesExecutor {
+             if (!pending) return;
+             if (!Environment.isExternalStorageManager()) return;
+ 
++            // A permission dialog can resume the activity after this helper's
++            // one-shot executor has finished. Avoid crashing the app on that
++            // benign second resume; a later normal launch can perform sync.
++            if (executor.isShutdown() || executor.isTerminated()) {
++                return;
++            }
++
+             // Clear the flag before starting work to avoid re-entry
+             prefs.edit().putBoolean("pending_sd_sync", false).apply();
+ 

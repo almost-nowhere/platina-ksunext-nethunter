@@ -1,0 +1,856 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!--Automatically translated supplemental UI strings. Curated strings.xml takes precedence for key screens.-->
+    <string name="nethunter_description">您可以添加、删除、移动、搜索、备份、恢复和重置您的自定义命令项。您还可以长按项目标签来编辑项目。</string>
+    <string name="nethunter_howtouse_cmd">在这里输入您自己的命令字符串，它将在 Android 环境中运行以显示输出。</string>
+    <string name="nethunter_howtouse_delimiter">如果要将输出分割成行，请输入所需的分隔符字符串，默认为“\\n”。</string>
+    <string name="nethunter_howtouse_runoncreate">要在创建片段时获取输出，请选中此选项。否则，您必须手动单击“运行”按钮才能获取输出。</string>
+    <string name="hid_powersploit_description">Powersploit 有效负载为您提供了反向 meterpreter HTTP/S 有效负载的选择。 “有效负载的 URL”应该是受害计算机可访问的 URL，较大的有效负载将下载到该位置。</string>
+    <string name="hid_windows_cmd_description">此 Windows CMD 负载允许您在 Windows 命令提示符中输入原始命令。点击列表菜单将允许您选择键盘布局或 UAC 绕过选项。</string>
+    <string name="hid_powershell_http_description">Powershell HTTP 有效负载允许您从 URL 下载并运行通用 powershell 有效负载。有效负载的 URL 应位于受害者可访问的位置。</string>
+    <string name="kali_services_description">Kali Chroot 服务可以通过切换按钮启动和停止，您还可以添加、删除、移动、搜索、备份、恢复和重置您自己的服务项目，长按项目标签也可以编辑该项目。</string>
+    <string name="kaliservices_howto_runServiceOnBoot">要在 Kali Chroot 启动后自动启动服务，请选中此选项。</string>
+    <string name="modules_description">管理内核模块（如果您的内核有任何支持的话）。大多数设备都使用内置的所有驱动程序。有关信息 (modinfo)，请单击并按住所选模块的菜单。</string>
+    <string name="custom_commands_description">您可以添加、删除、移动、搜索、备份、恢复和重置您的自定义命令项。您还可以长按项目标签来编辑项目。</string>
+    <string name="usbarsenal_hint1_imagemounter">*将所有 .img 或 .iso 文件放入“/sdcard/nh_files/diskimage/”</string>
+    <string name="usbarsenal_current_usb_state">当前USB状态：</string>
+    <string name="usbarsenal_description">在此选择您想要的 USB Arsenal 功能。如果功能为空，请尝试使用右上角的菜单删除 init 文件。某些目标可能需要时间才能在第一次尝试时启用 HID 驱动程序。</string>
+    <string name="usbarsenal_imagemounter_description">仅当 USB 功能“mass_storage”已启用时才能使用 Image Mounter</string>
+    <string name="usbarsenal_networktethering_description">仅当 USB 功能“rndis”或“acmecm”已启用时，才能使用 USB 网络共享</string>
+    <string name="badusb_label">BadUSB 中间人攻击</string>
+    <string name="badusb_description">这是我们在 Black Hat USA 2014 上演示的 BadUSB 攻击的实现。启用此 USB 小工具模式将允许您的设备在插入目标计算机时充当 USB 网络接口。将 USB 电缆连接到 PC 将强制来自该 PC（Windows 或 Linux）的所有流量通过 NetHunter 设备，其中流量可以被 MITM 处理。</string>
+    <string name="wifipumpkin_description">启动 Evil-Twin 接入点并拦截 HTTP 流量。自定义强制门户，具有移动网络上游 (rmnet_data*)、内部 wlan0 上游、内部 wlan0/wlan1 AP 模式和外部适配器。</string>
+    <string name="mana_hostapd_wpe">用于 802.1x/EAP 身份验证攻击的 hostapd 配置文件 (hostapd-wpe) 这不与 MANA 一起使用。</string>
+    <string name="mana_hostapd_wpe_certs">生成证书（仅限第一次）</string>
+    <string name="mana_dhcpd">Mana 使用的 dhcpd 配置文件。</string>
+    <string name="mana_dnsspoof">Mana 使用的 dnsspoof 配置文件。</string>
+    <string name="mana_nat_full">Mana 脚本执行完整的 NAT 和 SSL 拦截。</string>
+    <string name="mana_nat_simple">仅执行完整 NAT 的 Mana 脚本。</string>
+    <string name="mana_nat_simple_bdf">Mana 脚本执行完整的 NAT 和 BDFProxy HTTP 路由到端口 8080。</string>
+    <string name="bdfproxy_cfg">BDFProxy 的配置文件。</string>
+    <string name="mana_bettercap_description">使用 Mana-toolkit 将流量路由到 bettercap 代理</string>
+    <string name="hostapd_private_key">私钥密码</string>
+    <string name="duckConvertAttack">攻击</string>
+    <string name="duck_hunter_headline">DuckHunter 脚本可以轻松地将“USB Rubber Ducky”脚本转换为 NetHunter HID 格式。  您可以在非常有用的 Ducky Toolkit 站点生成预配置的脚本，或者从官方自述文件中查看 Rubber Ducky 脚本语法</string>
+    <string name="payload_select">请选择</string>
+    <string name="turn_off_external_wifi">关闭外部 Wifi</string>
+    <string name="stop_mana">停止法力</string>
+    <string name="start_mana">开始法力</string>
+    <string name="bssid">BSSID</string>
+    <string name="ssid">SSID</string>
+    <string name="chanel">渠道</string>
+    <string name="enable_karma">启用业力</string>
+    <string name="admin">UAC绕过</string>
+    <string name="choose_language">键盘布局</string>
+    <string name="payload">有效载荷</string>
+    <string name="karma_loud">业力响亮</string>
+    <string name="ps_ip_address">IP 地址（左主机）</string>
+    <string name="ps_port">港口（LPORT）</string>
+    <string name="ps_payload_url">有效负载的 URL</string>
+    <string name="macchanger_description">**重要提示：Android 10 已提供 MAC 随机化，但如果您仍想自己设置自定义 MAC 地址，则需要满足以下条件：\n1.在您连接的每个 SSID 上启用“使用随机 MAC”。\n2.您要连接的 AP 之前必须使用正确的密码进行连接。\n因为手动连接到 AP 会丢失更改后的 mac。</string>
+    <string name="TwoMACDigits">XX</string>
+    <string name="reloadMAC">重新加载MAC</string>
+    <string name="autorunningscripts">NetHunter：自动运行启动脚本</string>
+    <string name="toastForNoBusybox">呃哦！ NetHunter 找不到 busybox！</string>
+    <string name="readonly">只读</string>
+    <string name="kex_description">欢迎来到 Kali NetHunter 桌面体验！\n\n直接从口袋里享受 Kali Linux 的全部潜力，甚至在 HDMI 输出上也是如此。支持音频，使用音频管理器通过 KeX 传输声音。</string>
+    <string name="bt_description">欢迎来到英国电信阿森纳！内部 BT 支持适用于内核中启用了 RFCOMM、UART H4、VHCI 和 BINDER_IPC 的设备，或具有 bt_smd 驱动程序的设备。某些设备需要在启动 bluebinder 之前打开飞行模式。</string>
+    <string name="bt_carwhisperer">回来时的 Carwhisperer 脚本。聆听音频或将音频注入各种设备，如扬声器、耳机、手表甚至汽车。内部蓝牙（VHCI 或 bt_smd）尚不支持 Carwshisperer。</string>
+    <string name="bt_spoof">欺骗您的 BT 适配器地址、类别和名称。</string>
+    <string name="bt_tools">暴力破解 BT 设备地址、ping 并发现其服务。</string>
+    <string name="bt_badbt">受到 Mr.Robot 警车场景和 Flipper XFW 团队的启发，您现在可以创建蓝牙键盘服务器并直接从 NetHunter 发送击键。您可能需要从右上角菜单再次运行安装程序才能安装 BadBT。在智能手表上针对配对的手机运行此操作可能会使您的手表与手机/wearos 应用程序失去联系。前缀是实验性的。</string>
+    <string name="set_description">社会工程工具包电子邮件模板构建器，由 yesimxev 开发。请注意，您需要有有效的 SET Gmail 或电子邮件中继配置才能使用这些模板。如果您使用Gmail，建议不要有帐户图片。</string>
+    <string name="wps_description">OneShot 无需切换到监控模式即可执行 WPS PIN 和 Pixie Dust 攻击。请注意，如果扫描为空，您可能需要重置界面。</string>
+    <string name="settings_description">在这里选择您想要的启动动画。请注意，一些较旧的手机更喜欢原始屏幕分辨率的 90% 大小，这样才能流畅运行。在这种情况下，勾选“转换”，然后将图像分辨率和最终分辨率一起设置。</string>
+    <string name="kernel_description">找到适合您设备的内核并通过 Magisk 进行闪存。如果您的设备不支持运行时刷新，请通过恢复刷新内核。如果在内核存储库中未自动找到您设备的实际代号，请使用下面的列表来浏览可用的设备代号。</string>
+    <string name="nogoingback">没有回头路了。  你会失去 chroot 中的所有内容。  永远。\n\n注意：为了完全确保 chroot 未安装且没有进程使用它，设备现在将重新启动，然后 chroot 将被删除。</string>
+    <string name="rebootingdialogtitle">重新启动设备...</string>
+    <string name="rebootingdialogbody">设备正在重启。 （没有抱怨。你只是被告知这会发生！）</string>
+    <string name="deletingforroom">正在删除以腾出空间供下载...</string>
+    <string name="problemdeletingoldfile">删除旧文件时出现问题。</string>
+    <string name="startingdownload">开始下载。  支持…</string>
+    <string name="unwritablestorageerror">无处可写。  确保您已安装外部存储并且可用。</string>
+    <string name="checkingforchroot">“检查 chroot 位于”</string>
+    <string name="toastchrootmountedwarning">Kali chroot 已安装但未删除。  再次重启即可删除！！</string>
+    <string name="unzippinguntarringdone">解压和解压完成。</string>
+    <string name="unzippinganduntarring">解压缩并解压......</string>
+    <string name="downloadfailscheck">验证下载的文件时出错。  哎呀。  再试一次。</string>
+    <string name="aboutchroot">这是 Kali 的 Chroot 管理器。 “chroot”是 Kali Linux 的完整安装，它与 Android 共享处理、网络、存储和其他资源。它驻留在您的内部应用程序存储区域中，并且需要至少 8 GB 的可用空间来进行最小安装或完整安装，以确保它不会破坏您的系统。</string>
+    <string name="nhwarning">警告：\nNetHunter 在“底层”安装并使用标准 Kali Linux 发行版。  为了支持此功能，一些标准 Android 安全功能（例如安全增强型 Linux (SELinux)）被禁用。  此外，Kali 的 Linux 进程可以以完全 root 权限运行，因此可以访问远远超出正常 Android 安全模型的系统功能。  因此，考虑到该设备作为混合设备，可能不如标准 Kali Linux 或标准 Android 安全，建议您不要在“日常驱动程序”设备或存储或访问敏感/私人数据的设备上安装或使用 Nethunter。</string>
+    <string name="nhteam">开发人员：\ngitlab.com/groups/kalilinux/nethunter/-/group_members</string>
+    <string name="licenseInfo">许可证信息：\nNetHunter 根据 GPLv2 (gnu.org/licenses/old-licenses/gpl-2.0.en.html) 获得许可，源代码可在 gitlab.com/kalilinux/nethunter 上获取。\n 某些图标是根据 CC BY 4.0 (creativecommons.org/licenses/by/4.0) 从 Google, Inc. 获得许可的。 Android-VersionManager 和 jTar 在 Apache 2.0 下获得许可。</string>
+    <string name="chroot_manager_restore">恢复</string>
+    <string name="metapackagesExplanation">选择一些“元包”。 chroot 也将升级（通过“apt-get update/dist-upgrade”）。\n\n选择已安装的元包（或根本没有包）只需更新/升级而不删除任何内容。\n\n根据您选择的元包，可能会要求您执行某些操作（例如设置服务密码），因此请注意。</string>
+    <string name="metapackagesAdditionalInfo">本地存储要求可能在 20+ GB 范围内。此安装/更新将在终端中执行，因此请注意问题。完成后，按返回按钮。</string>
+    <string name="legacychroottitle">旧版 chroot 已找到！</string>
+    <string name="legacychrootmessage">您似乎已经从旧版本的 Nethunter 中获得了现有的 Kali chroot。\n\n将其迁移到新位置需要重新启动。\n\n 或者，您可以保留旧的 chroot，然后安装新的 chroot。  如果您选择此选项，请确保有足够的存储空间供两者使用。</string>
+    <string name="legacychrootposbutton">迁移（重新启动）</string>
+    <string name="legacychrootnegbutton">忽略当前</string>
+    <string name="mpc_description">MSFvenom Payload Creator (MSFPC) 是由 g0tmi1k 编写的包装器，用于根据用户的选择生成多种类型的有效负载。我们的想法是尽可能简单（仅需要一个输入）来生成其有效负载。</string>
+    <string name="mpc_type">类型：</string>
+    <string name="mpc_port">港口：</string>
+    <string name="mpc_ip_address">IP 地址：</string>
+    <string name="mpc_payload">有效负载选项：</string>
+    <string name="mpc_generateSDCARD">生成到SDCARD</string>
+    <string name="mpc_generateHTTP">生成到 HTTP</string>
+    <string name="add_lauchner_btn_label">标签：</string>
+    <string name="add_lauchner_btn_command">命令：</string>
+    <string name="toast_input_error_launcher">给出的参数无效！</string>
+    <string name="nmap_hint">scanme.nmap.org，192.168.0.1； 10.0.0–255.1–254</string>
+    <string name="nmap_all">启用操作系统版本检测、脚本扫描和跟踪路由</string>
+    <string name="nmap_timing_template">计时模板</string>
+    <string name="nmap_dontrandomize">不要随机化端口扫描</string>
+    <string name="nmap_topports">前 20 个港口</string>
+    <string name="nmap_hostdiscovery_ping">Ping 扫描</string>
+    <string name="nmap_scan_technique">扫描技术</string>
+    <string name="pineapple_description">菠萝连接器与 Hak5 Pineapple Nano 和 USB OTG 电缆配合使用。   该助手将通过以太网连接 Pineapple Nano 并上传您的 WiFi 连接。</string>
+    <string name="pineapple_gateway">Pineapple 网关/Web 接口 IP</string>
+    <string name="pineapple_port">菠萝纳米网络端口</string>
+    <string name="pineapple_ip">客户端IP</string>
+    <string name="pineapple_cidr">菠萝CIDR</string>
+    <string name="pineapple_start_OTG">设置连接</string>
+    <string name="pineapple_stop_OTG">关闭连接</string>
+    <string name="pineapple_noupstream">无上游</string>
+    <string name="pineapple_transproxy">将端口 80/443 转发至 8080/8083</string>
+    <string name="switch_gps_provider">安卓 GPS 提供商</string>
+    <string name="switch_gpsd">chroot 中的 GPSD</string>
+    <string name="switch_nexmon">Nexmon 支持</string>
+    <string name="gps_button_launch_app">在 NH 航站楼发射 %s</string>
+    <string name="gps_description">将您的 GPS 转换为 NMEA，然后提供给 Kali chroot。非常适合使用 Kismet 进行战争驾驶，或者只是 Kali 的通用 GPS 服务器。选择您所需的数据源。在启动 Kismet 之前，请确保您的无线接口处于监控模式。由于 QCACLD-3.0 驱动程序的监控模式，还可以使用内部无线接口。</string>
+    <string name="gps_help">您可能需要向 NetHunter 授予 GPS 权限。转至设置 &gt; 应用程序 &gt; NetHunter &gt; 权限。</string>
+    <string name="loading_wait">正在加载等待...</string>
+    <string name="loading_file">正在加载... 文件：%s</string>
+    <string name="scanButtonText">扫描</string>
+    <string name="advancedOptionsSwitchText">高级选项</string>
+    <string name="objects_to_inject">要注入的对象</string>
+    <string name="inject_characteristics">注射特性</string>
+    <string name="shellshock_command">炮击命令</string>
+    <string name="inject_settings">注入设置</string>
+    <string name="gps_notification_lat">“纬度：”</string>
+    <string name="gps_notification_long">“长的： ”</string>
+    <string name="gps_notification_source">“来源： ”</string>
+    <string name="gps_notification_age">“年龄： ”</string>
+    <string name="gps_notification_sats">“周六：”</string>
+    <string name="boot_notification_channel">开机</string>
+    <string name="boot_notification_channel_description">启动时运行服务的通知</string>
+    <string name="dummy_accessibility_service">虚拟_accessibility_service</string>
+    <string name="bootanimation_path_not_found">找不到启动动画路径</string>
+    <string name="launch_kismet_nhterm">在 NH 航站楼启动 Kismet</string>
+    <string name="list_of_available_folders">\n\n\"%s/\" 中的可用文件夹列表:\n\n</string>
+    <string name="not_yet_installed">还没有安装！</string>
+    <string name="running">跑步！</string>
+    <string name="stopped">已停止</string>
+    <string name="launch_kismet">发射天运</string>
+    <string name="full_path_to_where_you_want_to_save_the_database">要保存数据库的位置的完整路径：</string>
+    <string name="full_path_of_the_db_file_from_where_you_want_to_restore2">要恢复的数据库文件的完整路径：</string>
+    <string name="download_latest_kali_chroot_from_official_image">从官方镜像下载最新的 KALI CHROOT</string>
+    <string name="download_latest_kali_chroot_from_official_image2">从官方镜像下载最新的 KALI CHROOT</string>
+    <string name="type_the_full_path_of_your_kali_chroot_tarball_file">输入 Kali Chroot tarball 文件的完整路径：</string>
+    <string name="long_press_to_manage_a_command_dont_forget_to_backup_use_double_quotes_if_needed">长按管理命令，不要忘记备份！。如果需要，请使用双引号。</string>
+    <string name="search_command">搜索命令</string>
+    <string name="add_command">添加命令</string>
+    <string name="add">添加</string>
+    <string name="delete">删除</string>
+    <string name="move">移动</string>
+    <string name="not_supported">不支持</string>
+    <string name="supported">支持</string>
+    <string name="setup_done_key">wp3_setup_done</string>
+    <string name="good">好的</string>
+    <string name="nope">没有</string>
+    <string name="wpe_description">wpe_描述</string>
+    <string name="change_path">改变路径</string>
+    <string name="kali_arm64">kali-arm64</string>
+    <string name="loading_dot_dot_dot">加载中 …</string>
+    <string name="chroot_manager_install">安装</string>
+    <string name="chroot_manager_add_metapackage">添加元包</string>
+    <string name="chroot_manager_backup">备份</string>
+    <string name="chroot_manager_start">开始</string>
+    <string name="chroot_manager_stop">停止</string>
+    <string name="chroot_manager_remove">消除</string>
+    <string name="module_name">网络猎人音频</string>
+    <string name="audio_description">该模块允许通过本地服务器对 Android 环境进行 Chroot 音频播放，确保通过主扬声器无缝播放 HQ-Audio 输出。</string>
+    <string name="auto_start">自动启动</string>
+    <string name="playback_service_status">NH 播放 %1$s</string>
+    <string name="playback_status_starting">开始</string>
+    <string name="playback_status_buffering">缓冲</string>
+    <string name="playback_status_playing">演奏</string>
+    <string name="playback_status_stopping">停止</string>
+    <string name="playback_status_stopped">已停止</string>
+    <string name="playback_service_label">PulseDroid 播放</string>
+    <string name="service_notification_channel">脉冲机器人服务</string>
+    <string name="btn_play">玩</string>
+    <string name="btn_starting">开始…</string>
+    <string name="btn_buffering">缓冲中…</string>
+    <string name="btn_stop">停止</string>
+    <string name="btn_stopping">停止…</string>
+    <string name="btn_waiting">等待…</string>
+    <string name="btn_exit">出口</string>
+    <string name="input_port">港口</string>
+    <string name="input_host">主持人</string>
+    <string name="play_error">播放错误:\n%1$s</string>
+    <string name="buffer_infinite">无限</string>
+    <string name="buffer_none">没有任何</string>
+    <string name="input_buffer_headroom">缓冲区净空</string>
+    <string name="input_target_latency">目标延迟</string>
+    <string name="builderinfo">IamCOD3X</string>
+    <string name="moduleInfo">基于 dront78 的 PulseDroid 的模块</string>
+    <string name="duckhunter_conversion_failed">转换失败。</string>
+    <string name="audio_service_not_connected">服务尚未连接。请稍等。</string>
+    <string name="audio_service_not_bound">服务不受约束。请再试一次。</string>
+    <string name="error_title_empty">服务错误标题空</string>
+    <string name="expand_collapse">音频展开折叠</string>
+    <string name="vnc_watch_status">地位：</string>
+    <string name="vnc_watch_sessions">会议：</string>
+    <string name="vnc_hide_advanced_settings">隐藏高级设置</string>
+    <string name="vnc_disable_audio">禁用音频</string>
+    <string name="vnc_enable_audio">启用音频</string>
+    <string name="vnc_hide_advanced_settings2">隐藏高级设置</string>
+    <string name="vnc_show_advanced_settings">显示高级设置</string>
+    <string name="vnc_stopped">停止</string>
+    <string name="vnc_kexuser_none">没有任何</string>
+    <string name="vnc_running">跑步</string>
+    <string name="vnc_enable_audio2">启用音频</string>
+    <string name="vnc_disable_audio2">禁用音频</string>
+    <string name="macchanger_generate">产生</string>
+    <string name="macchanger_clear">清除</string>
+    <string name="macchanger_set_hostname">设置主机名</string>
+    <string name="macchanger_current_hostname">当前主机名：</string>
+    <string name="kaliservices_full_path_save_db">要保存数据库的位置的完整路径：</string>
+    <string name="kaliservices_full_path_restore_db">要恢复的数据库文件的完整路径：</string>
+    <string name="bt_interface">界面</string>
+    <string name="bt_service">电信服务</string>
+    <string name="bt_smd">蓝牙贴片</string>
+    <string name="bt_stopped">已停止</string>
+    <string name="bt_start">开始</string>
+    <string name="bt_running">跑步</string>
+    <string name="bt_stop">停止</string>
+    <string name="bt_enabled">启用</string>
+    <string name="bt_disabled">残疾人</string>
+    <string name="bt_up">向上</string>
+    <string name="bt_down">向下</string>
+    <string name="wps_wireless_interface">无线接口：</string>
+    <string name="wps_scan">扫描</string>
+    <string name="wps_reset_interface">复位接口</string>
+    <string name="wps_pixie_dust">精灵尘埃</string>
+    <string name="wps_pixie_force">精灵力量</string>
+    <string name="wps_online_bruteforce">在线暴力破解</string>
+    <string name="wps_custom_pin">自定义密码</string>
+    <string name="wps_delay">延迟</string>
+    <string name="wps_wps_button">WPS 按钮</string>
+    <string name="wps_pin">别针：</string>
+    <string name="wps_delay2">延迟：</string>
+    <string name="wps_seconds">秒</string>
+    <string name="wps_launch_attack">发动攻击</string>
+    <string name="kernel_flash_warning">⚠️ 警告：刷新自定义内核可能会使您的设备无法启动或在最坏的情况下；如果操作不当，您的设备将永久变砖。在继续之前，请务必确保您拥有当前内核和系统的完整备份。请自行承担风险。</string>
+    <string name="kernel_device_details">设备详细信息</string>
+    <string name="kernel_info_dialog">信息</string>
+    <string name="kernel_device">设备：</string>
+    <string name="kernel_loading">加载中 ..</string>
+    <string name="kernel_codename">代号：</string>
+    <string name="kernel_android">安卓：</string>
+    <string name="kernel_custom_codename">选择设备</string>
+    <string name="kernel_device_codename">设备代号</string>
+    <string name="kernel_check">搜索</string>
+    <string name="kernel_select_kernel_to_flash">选择要刷新的内核</string>
+    <string name="kernel_kernel_nethunter_zip">/sdcard/kernel_nethunter.zip</string>
+    <string name="kernel_flash_kernel">闪存内核</string>
+    <string name="wifi_status">无线网络状态</string>
+    <string name="chrootmgr_download_latest">下载最新的 KALI CHROOT</string>
+    <string name="chrootmgr_install_from_local_storage">从本地存储安装</string>
+    <string name="modules_path">模块路径</string>
+    <string name="modules_lsmod">lsmod</string>
+    <string name="modules_refresh">刷新</string>
+    <string name="modules_available_modules">可用模块</string>
+    <string name="usbarsenal_full_db_path_save">要保存数据库的位置的完整路径：</string>
+    <string name="usbarsenal_full_db_path_restore">要恢复的数据库文件的完整路径：</string>
+    <string name="usbarsenal_no_usb_function_enabled">未启用USB功能</string>
+    <string name="usbarsenal_no_image_mounted">没有安装图像。</string>
+    <string name="usbarsenal_linux_file_cd_store_gadget">Linux File-CD/Stor 小工具（内核默认）</string>
+    <string name="settings_bootanimation_path">找不到启动动画路径</string>
+    <string name="settings_set_enforcing">设置为强制执行</string>
+    <string name="settings_selinux_disabled">SELinux 已禁用</string>
+    <string name="settings_selinux_permissive">设置为允许</string>
+    <string name="settings_enforcing">执行</string>
+    <string name="settings_permissive">宽容的</string>
+    <string name="gps_permissions">GPS_权限</string>
+    <string name="gps_button_settings_description">GPS_button_settings_description</string>
+    <string name="gps_current_satellites_hint">当前卫星</string>
+    <string name="gps_bluetooth_device_text">人机界面0</string>
+    <string name="gps_bluetooth_device_hint">蓝牙接口</string>
+    <string name="gps_wlan_interface_text">无线局域网0</string>
+    <string name="gps_wlan_interface_hint">无线接口</string>
+    <string name="gps_on">在</string>
+    <string name="gps_off">离开</string>
+    <string name="gps_rtl_sdr">RTL SDR</string>
+    <string name="gps_rtl_amr">RTL AMR</string>
+    <string name="gps_rtl_adsb">RTL ADSB</string>
+    <string name="gps_mousejack">鼠标杰克</string>
+    <string name="gps_settings">GPS 设置</string>
+    <string name="wp3_supported">支持</string>
+    <string name="wp3_not_supported">不支持</string>
+    <string name="eviltwin_setup_title">邪恶双胞胎设置</string>
+    <string name="eviltwin_setup_message">这似乎是第一次运行。\n\nEvil Twin 模块需要安装所需的软件包和攻击脚本。\n\n现在安装 Evil Twin 工具吗？</string>
+    <string name="eviltwin_setup_button">设置</string>
+    <string name="eviltwin_dismiss_button">解雇</string>
+    <string name="eviltwin_description">使用虚拟创建的 AP 运行带有握手验证的虚假接入点门户。您只需要一个外部适配器即可扫描和解除目标网络的身份验证。</string>
+    <string name="action_setup">设置</string>
+    <string name="action_update">更新</string>
+    <string name="action_documentation">文档</string>
+    <string name="info">信息</string>
+    <string name="nethunter_full_path_save_db">要保存数据库的位置的完整路径：</string>
+    <string name="nethunter_full_path_db_restore">要恢复的数据库文件的完整路径：</string>
+    <string name="about_carsenal">关于CARsenal</string>
+    <string name="audio_audio_control">音频控制</string>
+    <string name="audio_host_hint">主持人</string>
+    <string name="audio_text_port_hint">港口</string>
+    <string name="audio_logs">日志</string>
+    <string name="audio_about_module">关于模块</string>
+    <string name="audio_settings">音频设置</string>
+    <string name="audio_clear_logs">清除日志</string>
+    <string name="can_description">配置您的 CAN 接口并解码您的 VIN 识别号。</string>
+    <string name="can_tools_desc">释放 can-utils 套件的强大功能，使用 Freediag 诊断您的汽车，并使用 Cannelloni 在两台机器之间传输 CAN 帧！</string>
+    <string name="can_canusb_desc">通过使用 USB-CAN 转储和发送信号来使用 CAN 分析仪 USB！</string>
+    <string name="can_caribou_desc">一个友好的汽车安全探索工具。</string>
+    <string name="can_sim_desc">SocketCAN 仪表盘模拟器 (ICSim) 和统一诊断服务模拟器 (UDSim)</string>
+    <string name="can_msf_desc">使用 Metasploit 汽车模块！</string>
+    <string name="can_app_name">我的应用程序</string>
+    <string name="can_settings">设置</string>
+    <string name="can_refresh_button">刷新</string>
+    <string name="MainMenu">主菜单</string>
+    <string name="Interface">界面</string>
+    <string name="can0">可以0</string>
+    <string name="Start">开始</string>
+    <string name="Stop">停止</string>
+    <string name="Services">服务</string>
+    <string name="MTU">最大传输单元</string>
+    <string name="txqueuelen">txqueuelen</string>
+    <string name="Output">输出</string>
+    <string name="LongPress">🟧 = 长按编辑命令</string>
+    <string name="slcand">斯坎德</string>
+    <string name="hlcand">哈坎德</string>
+    <string name="ldattach">ldattach</string>
+    <string name="slcan_attach">slcan_attach</string>
+    <string name="socketcand">套接字</string>
+    <string name="RfcommBind">射频通讯绑定</string>
+    <string name="RfcommConnect">射频通讯连接</string>
+    <string name="VinInfo">车辆识别号信息</string>
+    <string name="VinNumber">4F2CU08102KM50866</string>
+    <string name="Check">查看</string>
+    <string name="Show">展示</string>
+    <string name="BasicTools">基本工具</string>
+    <string name="RHOST">罗斯特</string>
+    <string name="LPORT">左端口</string>
+    <string name="RPORT">报告端口</string>
+    <string name="Sequence">顺序</string>
+    <string name="SequenceValue">01a#11223344AABBCCDD</string>
+    <string name="CanLogPath">/root/candump/dump.log</string>
+    <string name="CanGen">坎根</string>
+    <string name="CanDump">可以转储</string>
+    <string name="CanSniffer">罐嗅探器</string>
+    <string name="CanSend">可以发送</string>
+    <string name="CanPlayer">播放器</string>
+    <string name="SequenceFinder">序列查找器</string>
+    <string name="Asc2Log">升序2日志</string>
+    <string name="Log2Asc">Log2Asc</string>
+    <string name="Freediag">免费诊断</string>
+    <string name="DiagTest">诊断测试</string>
+    <string name="Cannelloni">卡内罗尼</string>
+    <string name="Input">输入</string>
+    <string name="Browse">浏览</string>
+    <string name="AdvancedOptions">高级选项</string>
+    <string name="Interactive">交互的</string>
+    <string name="Verbose">冗长</string>
+    <string name="LocalLoopback">本地环回</string>
+    <string name="CustomCommand">自定义命令</string>
+    <string name="CustomCommandValue">canbusload can0@100000 -r -t -b -c</string>
+    <string name="Run">跑步</string>
+    <string name="CanUSB">CAN转USB</string>
+    <string name="run">跑步</string>
+    <string name="ID">ID</string>
+    <string name="Data">数据</string>
+    <string name="Counter">柜台</string>
+    <string name="Sleep">睡觉</string>
+    <string name="Mode">模式</string>
+    <string name="Debug">调试</string>
+    <string name="DataValue">数据（例如，0C1A2F3​​E0C1A2F3​​）</string>
+    <string name="Baudrate">波特率</string>
+    <string name="Refresh">刷新USB</string>
+    <string name="CanSpeed">CAN速度</string>
+    <string name="SleepMS">睡眠（毫秒）</string>
+    <string name="CaringCaribou">关爱驯鹿</string>
+    <string name="Message">信息</string>
+    <string name="MessageValue">0x7a0#c0.ff.ee.00.11.22.33.44</string>
+    <string name="File">文件</string>
+    <string name="Loop">环形</string>
+    <string name="Reverse">撤销</string>
+    <string name="Pad">软垫</string>
+    <string name="CandumpFormat">CanDump 格式</string>
+    <string name="Length">长度</string>
+    <string name="SeparateLine">单独的线</string>
+    <string name="Src">来源。</string>
+    <string name="Dst">目的地。</string>
+    <string name="Minimum">最低限度</string>
+    <string name="Maximum">最大限度</string>
+    <string name="Listener">聆听者</string>
+    <string name="Dump">倾倒</string>
+    <string name="Modules">模块</string>
+    <string name="Seed">种子</string>
+    <string name="SeedValue">0xabc123</string>
+    <string name="Min">分钟。</string>
+    <string name="Max">最大限度。</string>
+    <string name="StartAddress">起始地址</string>
+    <string name="StartAddressValue">0x1fffb000</string>
+    <string name="Delay">延迟</string>
+    <string name="sim">模拟器</string>
+    <string name="Configuration">配置</string>
+    <string name="UDSimConfigFile">UDSim 配置文件</string>
+    <string name="UDSimConfigPath">/opt/car_hacking/udsim_vcan_config</string>
+    <string name="msfautomotive">无国界医生汽车公司</string>
+    <string name="elmrelay">ELM327 继电器配置</string>
+    <string name="baudspeed">波特率</string>
+    <string name="module_info_local_hwbridge">模块信息:\n\n
+        名称: 硬件桥服务器\n
+        模块：辅助/服务器/local_hwbridge\n
+        许可证: Metasploit 框架许可证 (BSD)\n
+        等级：普通\n\n
+
+        提供者：\n
+            克雷格·史密斯\n\n
+
+        可用操作:\n
+            Web 服务器 - 运行 HWBridge Web 服务器\n\n
+
+        检查支持:\n
+            否\n\n
+
+        基本选项:\n
+            SRVHOST（必需）- 要侦听的本地主机或网络接口。这必须是本地计算机上的地址或 0.0.0.0 以侦听所有地址。\n
+            SRVPORT（必需）- 要侦听的本地端口。\n
+            SSL (可选) - 为传入连接协商 SSL\n
+            SSLCert（可选）- 自定义 SSL 证书的路径（默认是随机生成的）\n
+            URIPATH（可选）- 用于此漏洞利用的 URI（默认为随机）\n
+
+        说明:\n
+            该模块设置一个网络服务器来桥接之间的通信
+            Metasploit 和物理连接的硬件。
+            目前该模块支持：汽车</string>
+    <string name="module_info_can_flood">模块信息:\n\n
+        名称：CAN 洪水\n
+        模块：post/hardware/automotive/can_flood\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            彼得罗·比昂迪\n\n
+
+        模块副作用:\n
+            物理效应\n\n
+
+        模块稳定性：\n
+            崩溃服务关闭\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            CANBUS（必需）- CAN 接口\n
+            FRAMELIST（必需）- 帧列表文件的路径\n
+            ROUNDS（必需）- 执行的轮数\n
+            SESSION（必需）- 运行此模块的会话\n\n
+
+        说明:\n
+            该模块用提供的帧淹没 CAN 接口。</string>
+    <string name="module_info_canprobe">模块信息:\n\n
+        名称：探测 CAN 数据包中不同数据点的模块\n
+        模块：邮政/硬件/汽车/canprobe\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            克雷格·史密斯\n\n
+
+        模块副作用:\n
+            物理效应\n\n
+
+        模块稳定性：\n
+            崩溃服务关闭\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            CANBUS（可选）- 用于执行扫描的 CAN 总线，默认为连接的总线\n
+            FUZZ（可选）- 如果为 true，则对每个数据位置的所有可能值进行交互\n
+            PADDING（可选）- 如果给定一个值，将使用完整的 8 个字节并用该值填充\n
+            PROBEVALUE（可选）- 要注入到数据流中的值\n
+            SESSION（必需）- 运行此模块的会话\n
+            STARTID（可选）- 开始扫描的 CAN ID\n
+            STOPID（可选）- 用于停止扫描的 CAN ID\n\n
+
+        说明:\n
+            在两个 CAN ID 之间扫描并在每个字节位置写入数据。它将
+            写入设置的字节值（默认 0xFF）或迭代所有可能的值
+            该字节位置的（需要更长的时间）。不检查响应并且是
+            基本上是一个简单的盲模糊器。</string>
+    <string name="module_info_diagnostic_state">模块信息:\n\n
+        名称: 诊断状态\n
+        模块：post/hardware/automotive/diagnostic_state\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            杰·图拉\n\n
+
+        模块副作用:\n
+            物理效应\n\n
+
+        模块稳定性：\n
+            崩溃安全\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            ARBID（可选）- 用于执行诊断状态的 CAN ID\n
+            CANBUS（可选）- 用于执行扫描的 CAN 总线，默认为连接的总线\n
+            ROUNDS（必需）- 执行的轮数\n
+            SESSION（必需）- 运行此模块的会话\n\n
+
+        说明:\n
+            该模块将通过发送测试仪存在数据包来使车辆在轮次中保持诊断状态。</string>
+    <string name="module_info_ecu_hard_reset">模块信息:\n\n
+        名称: ECU 硬重置\n
+        模块：post/hardware/automotive/ecu_hard_reset\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            杰·图拉\n\n
+
+        模块副作用:\n
+            物理效应\n\n
+
+        模块稳定性：\n
+            崩溃服务重新启动\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            ARBID（可选）- 用于执行 ECU 硬重置的 CAN ID\n
+            CANBUS（可选）- 用于执行扫描的 CAN 总线，默认为连接的总线\n
+            SESSION（必需）- 运行此模块的会话\n\n
+
+        说明:\n
+            该模块在 ECU 重置服务标识符 (0x11) 中执行硬重置。</string>
+    <string name="module_info_getvinfo">模块信息:\n\n
+        名称：从目标模块获取VIN等车辆信息\n
+        模块：post/hardware/automotive/getvinfo\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            克雷格·史密斯\n\n
+
+        模块稳定性：\n
+            崩溃安全\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            CANBUS（可选）- 用于执行扫描的 CAN 总线，默认为连接的总线\n
+            CLEAR_DTCS（可选）- 如果存在错误，则清除所有 DTC 并重置 MIL\n
+            DSTID（可选）- 预期响应 ID，默认为 SRCID + 8\n
+            FC（可选）- 可选力流控制\n
+            PADDING（可选）- 可选的数据包结尾填充\n
+            SESSION（必需）- 运行此模块的会话\n
+            SRCID（必需）- 要查询的模块 ID\n\n
+
+        说明:\n
+            该模块查询故障码、一些常见的发动机信息和车辆信息。
+
+            它返回发动机转速、冷却液温度、诊断故障等信息
+            代码以及模式 $09 存储的所有信息车辆信息、VIN 等。</string>
+    <string name="module_info_identifymodules">模块信息:\n\n
+        名称: 扫描 CAN 总线以查找诊断模块\n
+        模块：post/hardware/automotive/identifymodules\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            克雷格·史密斯\n\n
+
+        模块稳定性：\n
+            崩溃安全\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            CANBUS（可选）- 用于执行扫描的 CAN 总线，默认为连接的总线\n
+            ENDID（必需）- 在此 ID 处结束扫描\n
+            SESSION（必需）- 运行此模块的会话\n
+            STARTID（必需）- 从此 ID 开始扫描\n\n
+
+        说明:\n
+            扫描 CAN 总线以查找可以响应 UDS DSC 查询的任何模块。</string>
+    <string name="module_info_malibu_overheat">模块信息:\n\n
+        名称：2006 年马里布洪水温度计的示例模块\n
+        模块：post/hardware/automotive/malibu_overheat\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            克雷格·史密斯\n\n
+
+        模块副作用:\n
+            屏幕效果\n\n
+
+        模块稳定性：\n
+            服务资源丢失\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            CANBUS（可选）- 用于执行扫描的 CAN 总线，默认为连接的总线\n
+            PACKET_COUNT（可选）- 停止之前发送的数据包数量\n
+            SESSION（必需）- 运行此模块的会话\n\n
+
+        说明:\n
+            2006 年 Malibu 的简单温度洪水示例。</string>
+    <string name="module_info_mazda_ic_mover">模块信息:\n\n
+        名称: Mazda 2 仪表组加速度计移动器\n
+        模块：post/hardware/automotive/mazda_ic_mover\n
+        平台：硬件\n
+        拱门：\n
+        等级：普通\n\n
+
+        提供者：\n
+            杰·图拉\n\n
+
+        模块副作用:\n
+            屏幕效果\n\n
+
+        模块稳定性：\n
+            服务资源丢失\n\n
+
+        兼容的会话类型:\n
+            硬件桥\n\n
+
+        基本选项:\n
+            CANBUS（可选）- 用于执行扫描的 CAN 总线，默认为连接的总线\n
+            SESSION（必需）- 运行此模块的会话\n\n
+
+        说明:\n
+            该模块移动 Mazda 2 仪表组的加速计和速度计的指针。</string>
+    <string name="module_set_local_hwbridge">\n选项:\n
+        \nSRVHOST|0.0.0.0|必需
+        \nSRVPORT|8080|必需
+        \nSSL|假|可选
+        \nSSLCert||可选
+        \nURIPATH||可选
+        \n高级选项:\n
+        \nListenerBindAddress||可选
+        \nListenerBindPort||可选
+        \nListenerComm||可选
+        \nSSLCipher||可选
+        \nSSL压缩|假|可选
+        \nSSLVersion|自动|可选
+        \nSendRobots|假|可选
+        \nURIHOST||可选
+        \nURIPORT||可选
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_connect">\n选项:\n
+        \nDEBUGJSON|false|可选
+        \n代理||可选
+        \nRHOSTS|127.0.0.1|必需
+        \nRPORT|8080|必需
+        \nSSL|假|可选
+        \nTARGETURI|/|必需
+        \nVHOST||可选
+        \n高级选项:\n
+        \n域|工作站|必需
+        \nDigestAuthIIS|true|可选
+        \n指纹检查|true|可选
+        \nHttpClientTimeout||可选
+        \nHttpPassword||可选
+        \nHttpRawHeaders||可选
+        \nHttpTrace|假|可选
+        \nHttpTraceColors|红/蓝|可选
+        \nHttpTraceHeadersOnly|false|可选
+        \nHttp用户名||可选
+        \nSSLKeyLogFile||可选
+        \nSSL服务器名称指示||可选
+        \nSSL 版本|自动|必需
+        \nUserAgent||可选
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_canprobe">\n选项:\n
+        \nCANBUS||可选
+        \nFUZZ|假|可选
+        \nPADDING||可选
+        \nPROBEVALUE|255|可选
+        \n会话||必需
+        \nSTARTID|768|可选
+        \nSTOPID||可选
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_diagnostic_state">\n选项:\n
+        \nARBID|0x7DF|可选
+        \nCANBUS||可选
+        \n回合|500|需要
+        \n会话||必需
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_ecu_hard_reset">\n选项:\n
+        \nARBID|0x7DF|可选
+        \nCANBUS||可选
+        \n会话||必需
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_getvinfo">\n选项:\n
+        \nCANBUS||可选
+        \nCLEAR_DTCS|假|可选
+        \nDSTID|2024|可选
+        \nFC|假|可选
+        \nPADDING||可选
+        \n会话||必需
+        \nSRCID|2016|必填
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_identifymodules">\n选项:\n
+        \nCANBUS||可选
+        \nENDID|2039|必需
+        \n会话||必需
+        \nSTARTID|1536|必需
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_malibu_overheat">\n选项:\n
+        \nCANBUS||可选
+        \nPACKET_COUNT|200|可选
+        \n会话||必需
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_mazda_ic_mover">\n选项:\n
+        \nCANBUS||可选
+        \n会话||必需
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="module_set_pdt">\n选项:\n
+        \nCANBUS||可选
+        \nDSTID|2041|可选
+        \nPADDING|0|可选
+        \n会话||必需
+        \nSRCID|2033|必需
+        \n高级选项:\n
+        \n详细|假|可选
+        \n工作空间||可选</string>
+    <string name="settings_set_to_enforcing">设置为强制执行</string>
+    <string name="settings_selinux_is_disabled">SELinux 已禁用</string>
+    <string name="settings_set_to_permissive">设置为允许</string>
+    <string name="settings_string_enforcing">执行</string>
+    <string name="settings_string_set_to_enforcing">设置为强制执行</string>
+    <string name="settings_string_permissive">宽容的</string>
+    <string name="settings_bootanimation_path_not_found">找不到启动动画路径</string>
+    <string name="action_debug">kex_调试_标题</string>
+    <string name="vnc_apply_button">申请</string>
+    <string name="vnc_remove_selected_resolution">删除选定的分辨率</string>
+    <string name="vnc_new_resolution">新决议</string>
+    <string name="vnc_reset_button">重置</string>
+    <string name="vnc_backup_button">备份</string>
+    <string name="vnc_restore_button">恢复</string>
+    <string name="vnc_device_resolution_for_hdmi">HDMI 设备分辨率</string>
+    <string name="vnc_immersive_mode">沉浸式模式</string>
+    <string name="vnc_remove_selected_kali_user">删除选定的 Kali 用户</string>
+    <string name="vnc_add_new_kali_user">添加新的 Kali 用户</string>
+    <string name="vnc_manage_kali_users">管理 Kali 用户</string>
+    <string name="vnc_restore_resolutions_button">恢复</string>
+    <string name="vnc_backup_resolutions_button">备份</string>
+    <string name="vnc_new_resolution_button">新决议</string>
+    <string name="vnc_remove_selected_resolution_button">删除选定的分辨率</string>
+    <string name="vnc_kex_server_resolution_optional">KEX 服务器分辨率（可选）</string>
+    <string name="vnc_show_advanced_settings_button">显示高级设置</string>
+    <string name="vnc_open_kex_client">打开KEX客户端</string>
+    <string name="vnc_active_sessions">活跃会话：</string>
+    <string name="vnc_content_description_none">没有任何</string>
+    <string name="vnc_kex_server_status">KeX服务器状态：</string>
+    <string name="vnc_stop_server_button">停止服务器</string>
+    <string name="vnc_start_server_button">启动服务器</string>
+    <string name="vnc_enable_audio_button">启用音频</string>
+    <string name="vnc_display_text">展示：</string>
+    <string name="vnc_user_text">用户：</string>
+    <string name="vnc_delay_time">延迟时间</string>
+    <string name="vnc_start_delay_checkbox">启动延迟</string>
+    <string name="vnc_localhost_only">仅本地主机</string>
+    <string name="vnc_enable_at_boot">启动时启用</string>
+    <string name="vnc_setup_local_server">设置本地服务器</string>
+    <string name="vnc_close_button">关闭</string>
+    <string name="vnc_information_menu_button">信息</string>
+    <string name="nethunter_full_path_savedb">要保存数据库的位置的完整路径：</string>
+    <string name="nethunter_full_path_restoredb">要恢复的数据库文件的完整路径：</string>
+    <string name="can_hide_services">隐藏服务</string>
+    <string name="can_services">服务</string>
+    <string name="can_hide_configuration">隐藏配置</string>
+    <string name="can_configuration">配置</string>
+    <string name="can_hide_advanced_options">隐藏高级选项</string>
+    <string name="can_advanced_options">高级选项</string>
+    <string name="can_elm327_relay_configuration">ELM327 继电器配置</string>
+    <string name="can_no_options_for_module">该模块没有可用的选项。</string>
+    <string name="customcommands_full_path_db_restore">要恢复的数据库文件的完整路径：</string>
+    <string name="customcommands_full_path_db_save">要保存数据库的位置的完整路径：</string>
+    <string name="usb_no_usb_function_enabled">未启用USB功能</string>
+    <string name="usb_no_image_mounted">没有安装图像。</string>
+    <string name="usb_linux_file_cd_storage_gadget">Linux File-CD/Stor 小工具（内核默认）</string>
+    <string name="usb_full_path_db_save">要保存数据库的位置的完整路径：</string>
+    <string name="usb_full_path_db_restore">要恢复的数据库文件的完整路径：</string>
+    <string name="wp3_ap_mode_supported">支持</string>
+    <string name="wp3_ap_mode_not_supported">不支持</string>
+    <string name="audio_permission_denied_cannot_start_playback">音频权限被拒绝。无法开始播放。</string>
+    <string name="notification_permission_denied">音频通知权限拒绝</string>
+    <string name="terminal_setup_icon_desc">设置</string>
+    <string name="terminal_setup_title">终端设置</string>
+    <string name="terminal_setup_later">之后</string>
+    <string name="terminal_setup_setup">设置</string>
+    <string name="terminal_setup_setting_up">正在设置...</string>
+    <string name="terminal_initial_command">初始命令</string>
+    <string name="terminal_initial_command_icon_desc">初始命令</string>
+    <string name="terminal_initial_command_desc">配置命令以在打开终端时自动运行。如果您希望以空白提示开始，请禁用它。</string>
+    <string name="terminal_initial_command_enable">启用初始命令</string>
+    <string name="terminal_initial_command_hint">例如，newofetch</string>
+    <string name="terminal_initial_command_saved">已保存初始命令</string>
+    <string name="presets">预设</string>
+    <string name="terminal_preset_uname">uname -a</string>
+    <string name="terminal_preset_neowofetch">neowofetch ||新提取</string>
+    <string name="terminal_preset_clear">清除</string>
+    <string name="terminal_preset_ls">ls-la</string>
+    <string name="terminal_preset_whoami">瓦阿米</string>
+    <string name="terminal_save">节省</string>
+    <string name="terminal_button_ctrl">控制键</string>
+    <string name="terminal_button_clear">清除</string>
+    <string name="terminal_button_goto_bottom">转到底部</string>
+    <string name="terminal_button_tab">选项卡</string>
+    <string name="terminal_label_theme">主题</string>
+    <string name="terminal_title_preview">预览</string>
+    <string name="terminal_title_layout">布局</string>
+    <string name="terminal_stop_sessions">停止会话</string>
+    <string name="terminal_button_esc">ESC键</string>
+    <string name="terminal_text_copy">复制</string>
+    <string name="terminal_copy_selected">复制选定的行</string>
+</resources>

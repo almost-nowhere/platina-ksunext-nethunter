@@ -1,0 +1,963 @@
+diff --git a/arch/arm64/configs/platina_defconfig b/arch/arm64/configs/platina_defconfig
+index 94ff5d74..39e4ce5b 100644
+--- a/arch/arm64/configs/platina_defconfig
++++ b/arch/arm64/configs/platina_defconfig
+@@ -34,6 +34,7 @@ CONFIG_BLK_DEV_INITRD=y
+ # CONFIG_RD_LZO is not set
+ # CONFIG_RD_LZ4 is not set
+ CONFIG_KALLSYMS_ALL=y
++CONFIG_KSU=y
+ # CONFIG_MEMBARRIER is not set
+ CONFIG_EMBEDDED=y
+ # CONFIG_SLUB_DEBUG is not set
+diff --git a/drivers/Kconfig b/drivers/Kconfig
+index 4051a164..585d2136 100644
+--- a/drivers/Kconfig
++++ b/drivers/Kconfig
+@@ -214,4 +214,6 @@ source "drivers/sensors/Kconfig"
+ 
+ source "drivers/tee/Kconfig"
+ 
++source "drivers/kernelsu/Kconfig"
++
+ endmenu
+diff --git a/drivers/Makefile b/drivers/Makefile
+index d3f690ab..ecb4ddc8 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -185,3 +185,5 @@ obj-$(CONFIG_BIF)		+= bif/
+ obj-$(CONFIG_SENSORS_SSC)	+= sensors/
+ obj-$(CONFIG_ESOC)              += esoc/
+ obj-$(CONFIG_TEE)		+= tee/
++
++obj-$(CONFIG_KSU)		+= kernelsu/
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c3eaaa35..56b5bc2d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -350,6 +350,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3461), .driver_info = BTUSB_REALTEK },
+ 	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_REALTEK },
+ 
++	/* TP-Link UB500 / Realtek 8761B */
++	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK },
++
+ 	/* Additional Realtek 8822BE Bluetooth devices */
+ 	{ USB_DEVICE(0x0b05, 0x185c), .driver_info = BTUSB_REALTEK },
+ 
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index c08b27c3..dca971aa 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -87,6 +87,7 @@ struct hci_uart {
+ 
+ 	struct sk_buff		*tx_skb;
+ 	unsigned long		tx_state;
++	spinlock_t		rx_lock;
+ 
+ 	unsigned int init_speed;
+ 	unsigned int oper_speed;
+diff --git a/drivers/input/input.c b/drivers/input/input.c
+index 85791708..1dc5912c 100644
+--- a/drivers/input/input.c
++++ b/drivers/input/input.c
+@@ -368,11 +368,19 @@ static int input_get_disposition(struct input_dev *dev,
+ 	return disposition;
+ }
+ 
++#ifdef CONFIG_KSU
++extern int ksu_handle_input_handle_event(unsigned int *type,
++					 unsigned int *code, int *value);
++#endif
++
+ static void input_handle_event(struct input_dev *dev,
+ 			       unsigned int type, unsigned int code, int value)
+ {
+ 	int disposition;
+ 
++#ifdef CONFIG_KSU
++	ksu_handle_input_handle_event(&type, &code, &value);
++#endif
+ 	disposition = input_get_disposition(dev, type, code, &value);
+ 
+ 	if ((disposition & INPUT_PASS_TO_DEVICE) && dev->event)
+diff --git a/drivers/net/can/usb/peak_usb/pcan_usb_pro.c b/drivers/net/can/usb/peak_usb/pcan_usb_pro.c
+index d85fdc69..7974aef5 100644
+--- a/drivers/net/can/usb/peak_usb/pcan_usb_pro.c
++++ b/drivers/net/can/usb/peak_usb/pcan_usb_pro.c
+@@ -127,7 +127,7 @@ static u8 *pcan_msg_init_empty(struct pcan_usb_pro_msg *pm,
+ /*
+  * add one record to a message being built
+  */
+-static int pcan_msg_add_rec(struct pcan_usb_pro_msg *pm, u8 id, ...)
++static int pcan_msg_add_rec(struct pcan_usb_pro_msg *pm, int id, ...)
+ {
+ 	int len, i;
+ 	u8 *pc;
+diff --git a/drivers/net/wireless/ath/ath6kl/main.c b/drivers/net/wireless/ath/ath6kl/main.c
+index 1a685182..3695936e 100644
+--- a/drivers/net/wireless/ath/ath6kl/main.c
++++ b/drivers/net/wireless/ath/ath6kl/main.c
+@@ -639,7 +639,7 @@ void ath6kl_connect_event(struct ath6kl_vif *vif, u16 channel, u8 *bssid,
+ 	memcpy(vif->bssid, bssid, sizeof(vif->bssid));
+ 	vif->bss_ch = channel;
+ 
+-	if ((vif->nw_type == INFRA_NETWORK)) {
++	if (vif->nw_type == INFRA_NETWORK) {
+ 		ath6kl_wmi_listeninterval_cmd(ar->wmi, vif->fw_vif_idx,
+ 					      vif->listen_intvl_t, 0);
+ 		ath6kl_check_ch_switch(ar, channel);
+diff --git a/drivers/net/wireless/ath/ath9k/eeprom.h b/drivers/net/wireless/ath/ath9k/eeprom.h
+index 40d4f62d..fa034cfb 100644
+--- a/drivers/net/wireless/ath/ath9k/eeprom.h
++++ b/drivers/net/wireless/ath/ath9k/eeprom.h
+@@ -95,7 +95,7 @@
+ #define AR9285_RDEXT_DEFAULT    0x1F
+ 
+ #define ATH9K_POW_SM(_r, _s)	(((_r) & 0x3f) << (_s))
+-#define FREQ2FBIN(x, y)		((y) ? ((x) - 2300) : (((x) - 4800) / 5))
++#define FREQ2FBIN(x, y)		(u8)((y) ? ((x) - 2300) : (((x) - 4800) / 5))
+ #define FBIN2FREQ(x, y)		((y) ? (2300 + x) : (4800 + 5 * x))
+ #define ath9k_hw_use_flash(_ah)	(!(_ah->ah_flags & AH_USE_EEPROM))
+ 
+diff --git a/drivers/net/wireless/ath/ath9k/htc_drv_init.c b/drivers/net/wireless/ath/ath9k/htc_drv_init.c
+index e21df6ea..8274fb8c 100644
+--- a/drivers/net/wireless/ath/ath9k/htc_drv_init.c
++++ b/drivers/net/wireless/ath/ath9k/htc_drv_init.c
+@@ -134,7 +134,7 @@ static inline int ath9k_htc_connect_svc(struct ath9k_htc_priv *priv,
+ 	req.ep_callbacks.rx = ath9k_htc_rxep;
+ 	req.ep_callbacks.tx = tx;
+ 
+-	return htc_connect_service(priv->htc, &req, ep_id);
++	return htc_connect_service_hst(priv->htc, &req, ep_id);
+ }
+ 
+ static int ath9k_init_htc_services(struct ath9k_htc_priv *priv, u16 devid,
+diff --git a/drivers/net/wireless/ath/ath9k/htc_drv_main.c b/drivers/net/wireless/ath/ath9k/htc_drv_main.c
+index e32e35b5..7036d741 100644
+--- a/drivers/net/wireless/ath/ath9k/htc_drv_main.c
++++ b/drivers/net/wireless/ath/ath9k/htc_drv_main.c
+@@ -226,7 +226,7 @@ void ath9k_htc_reset(struct ath9k_htc_priv *priv)
+ 	WMI_CMD_BUF(WMI_SET_MODE_CMDID, &htc_mode);
+ 
+ 	WMI_CMD(WMI_ENABLE_INTR_CMDID);
+-	htc_start(priv->htc);
++	htc_start_hst(priv->htc);
+ 	ath9k_htc_vif_reconfig(priv);
+ 	ieee80211_wake_queues(priv->hw);
+ 
+@@ -305,7 +305,7 @@ static int ath9k_htc_set_channel(struct ath9k_htc_priv *priv,
+ 	if (ret)
+ 		goto err;
+ 
+-	htc_start(priv->htc);
++	htc_start_hst(priv->htc);
+ 
+ 	if (!test_bit(ATH_OP_SCANNING, &common->op_flags) &&
+ 	    !(hw->conf.flags & IEEE80211_CONF_OFFCHANNEL))
+@@ -958,7 +958,7 @@ static int ath9k_htc_start(struct ieee80211_hw *hw)
+ 			"Failed to update capability in target\n");
+ 
+ 	clear_bit(ATH_OP_INVALID, &common->op_flags);
+-	htc_start(priv->htc);
++	htc_start_hst(priv->htc);
+ 
+ 	spin_lock_bh(&priv->tx.tx_lock);
+ 	priv->tx.flags &= ~ATH9K_HTC_OP_TX_QUEUES_STOP;
+diff --git a/drivers/net/wireless/ath/ath9k/htc_drv_txrx.c b/drivers/net/wireless/ath/ath9k/htc_drv_txrx.c
+index 6a9c9b4e..f4c5607c 100644
+--- a/drivers/net/wireless/ath/ath9k/htc_drv_txrx.c
++++ b/drivers/net/wireless/ath/ath9k/htc_drv_txrx.c
+@@ -543,7 +543,7 @@ void ath9k_htc_tx_drain(struct ath9k_htc_priv *priv)
+ 	 * Ensure that all pending TX frames are flushed,
+ 	 * and that the TX completion/failed tasklets is killed.
+ 	 */
+-	htc_stop(priv->htc);
++	htc_stop_hst(priv->htc);
+ 	tasklet_kill(&priv->wmi->wmi_event_tasklet);
+ 	tasklet_kill(&priv->tx_failed_tasklet);
+ 
+diff --git a/drivers/net/wireless/ath/ath9k/htc_hst.c b/drivers/net/wireless/ath/ath9k/htc_hst.c
+index 625823e4..1d0031f8 100644
+--- a/drivers/net/wireless/ath/ath9k/htc_hst.c
++++ b/drivers/net/wireless/ath/ath9k/htc_hst.c
+@@ -236,7 +236,7 @@ int htc_init(struct htc_target *target)
+ 	return htc_setup_complete(target);
+ }
+ 
+-int htc_connect_service(struct htc_target *target,
++int htc_connect_service_hst(struct htc_target *target,
+ 		     struct htc_service_connreq *service_connreq,
+ 		     enum htc_endpoint_id *conn_rsp_epid)
+ {
+@@ -311,12 +311,12 @@ int htc_send_epid(struct htc_target *target, struct sk_buff *skb,
+ 	return htc_issue_send(target, skb, skb->len, 0, epid);
+ }
+ 
+-void htc_stop(struct htc_target *target)
++void htc_stop_hst(struct htc_target *target)
+ {
+ 	target->hif->stop(target->hif_dev);
+ }
+ 
+-void htc_start(struct htc_target *target)
++void htc_start_hst(struct htc_target *target)
+ {
+ 	target->hif->start(target->hif_dev);
+ }
+diff --git a/drivers/net/wireless/ath/ath9k/htc_hst.h b/drivers/net/wireless/ath/ath9k/htc_hst.h
+index 06474ccc..0bd3e6b7 100644
+--- a/drivers/net/wireless/ath/ath9k/htc_hst.h
++++ b/drivers/net/wireless/ath/ath9k/htc_hst.h
+@@ -203,14 +203,14 @@ struct htc_comp_msg {
+ } __packed;
+ 
+ int htc_init(struct htc_target *target);
+-int htc_connect_service(struct htc_target *target,
++int htc_connect_service_hst(struct htc_target *target,
+ 			  struct htc_service_connreq *service_connreq,
+ 			  enum htc_endpoint_id *conn_rsp_eid);
+ int htc_send(struct htc_target *target, struct sk_buff *skb);
+ int htc_send_epid(struct htc_target *target, struct sk_buff *skb,
+ 		  enum htc_endpoint_id epid);
+-void htc_stop(struct htc_target *target);
+-void htc_start(struct htc_target *target);
++void htc_stop_hst(struct htc_target *target);
++void htc_start_hst(struct htc_target *target);
+ void htc_sta_drain(struct htc_target *target, u8 idx);
+ 
+ void ath9k_htc_rx_msg(struct htc_target *htc_handle,
+diff --git a/drivers/net/wireless/ath/ath9k/wmi.c b/drivers/net/wireless/ath/ath9k/wmi.c
+index f100533e..6041820c 100644
+--- a/drivers/net/wireless/ath/ath9k/wmi.c
++++ b/drivers/net/wireless/ath/ath9k/wmi.c
+@@ -264,7 +264,7 @@ int ath9k_wmi_connect(struct htc_target *htc, struct wmi *wmi,
+ 	connect.ep_callbacks.rx = ath9k_wmi_ctrl_rx;
+ 	connect.service_id = WMI_CONTROL_SVC;
+ 
+-	ret = htc_connect_service(htc, &connect, &wmi->ctrl_epid);
++	ret = htc_connect_service_hst(htc, &connect, &wmi->ctrl_epid);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/drivers/net/wireless/ath/regd.c b/drivers/net/wireless/ath/regd.c
+index 81f0dc1c..069c8937 100644
+--- a/drivers/net/wireless/ath/regd.c
++++ b/drivers/net/wireless/ath/regd.c
+@@ -667,9 +667,9 @@ ath_regd_init_wiphy(struct ath_regulatory *reg,
+ 	 * Therefore, disable 2.4 Ghz channels that dont have 20 mhz bw
+ 	 */
+ 	for (chan_num = 0;
+-	     chan_num < wiphy->bands[IEEE80211_BAND_2GHZ]->n_channels;
++	     chan_num < wiphy->bands[NL80211_BAND_2GHZ]->n_channels;
+ 	     chan_num++) {
+-		chan = &wiphy->bands[IEEE80211_BAND_2GHZ]->channels[chan_num];
++		chan = &wiphy->bands[NL80211_BAND_2GHZ]->channels[chan_num];
+ 		if (chan->flags & IEEE80211_CHAN_NO_20MHZ)
+ 			chan->flags |= IEEE80211_CHAN_DISABLED;
+ 	}
+diff --git a/drivers/net/wireless/realtek/rtl818x/rtl8187/dev.c b/drivers/net/wireless/realtek/rtl818x/rtl8187/dev.c
+index 17e3d5e8..3a00e736 100644
+--- a/drivers/net/wireless/realtek/rtl818x/rtl8187/dev.c
++++ b/drivers/net/wireless/realtek/rtl818x/rtl8187/dev.c
+@@ -251,7 +251,10 @@ static void rtl8187_tx(struct ieee80211_hw *dev,
+ 	flags |= RTL818X_TX_DESC_FLAG_NO_ENC;
+ 
+ 	flags |= ieee80211_get_tx_rate(dev, info)->hw_value << 24;
+-	if (ieee80211_has_morefrags(tx_hdr->frame_control))
++	/* In monitor mode firmware cannot observe the fragment ACKs. */
++	if (ieee80211_has_morefrags(tx_hdr->frame_control) &&
++	    likely(info->control.vif != NULL &&
++		   info->control.vif->type != NL80211_IFTYPE_MONITOR))
+ 		flags |= RTL818X_TX_DESC_FLAG_MOREFRAG;
+ 
+ 	/* HW will perform RTS-CTS when only RTS flags is set.
+diff --git a/drivers/net/wireless/rt2x00/rt2800lib.c b/drivers/net/wireless/rt2x00/rt2800lib.c
+index 9e87dc35..4b1ad670 100644
+--- a/drivers/net/wireless/rt2x00/rt2800lib.c
++++ b/drivers/net/wireless/rt2x00/rt2800lib.c
+@@ -1490,7 +1490,7 @@ void rt2800_config_filter(struct rt2x00_dev *rt2x00dev,
+ 			   !(filter_flags & FIF_FCSFAIL));
+ 	rt2x00_set_field32(&reg, RX_FILTER_CFG_DROP_PHY_ERROR,
+ 			   !(filter_flags & FIF_PLCPFAIL));
+-	rt2x00_set_field32(&reg, RX_FILTER_CFG_DROP_NOT_TO_ME, 1);
++	rt2x00_set_field32(&reg, RX_FILTER_CFG_DROP_NOT_TO_ME, 0);
+ 	rt2x00_set_field32(&reg, RX_FILTER_CFG_DROP_NOT_MY_BSSD, 0);
+ 	rt2x00_set_field32(&reg, RX_FILTER_CFG_DROP_VER_ERROR, 1);
+ 	rt2x00_set_field32(&reg, RX_FILTER_CFG_DROP_MULTICAST,
+diff --git a/drivers/net/wireless/zd1211rw/zd_mac.c b/drivers/net/wireless/zd1211rw/zd_mac.c
+index 3e37a045..9ab50b17 100644
+--- a/drivers/net/wireless/zd1211rw/zd_mac.c
++++ b/drivers/net/wireless/zd1211rw/zd_mac.c
+@@ -242,14 +242,19 @@ void zd_mac_clear(struct zd_mac *mac)
+ static int set_rx_filter(struct zd_mac *mac)
+ {
+ 	unsigned long flags;
+-	u32 filter = STA_RX_FILTER;
++	struct zd_ioreq32 ioreqs[] = {
++		{ CR_RX_FILTER, STA_RX_FILTER },
++		{ CR_SNIFFER_ON, 0U },
++	};
+ 
+ 	spin_lock_irqsave(&mac->lock, flags);
+-	if (mac->pass_ctrl)
+-		filter |= RX_FILTER_CTRL;
++	if (mac->pass_ctrl) {
++		ioreqs[0].value |= 0xFFFFFFFF;
++		ioreqs[1].value = 0x1;
++	}
+ 	spin_unlock_irqrestore(&mac->lock, flags);
+ 
+-	return zd_iowrite32(&mac->chip, CR_RX_FILTER, filter);
++	return zd_iowrite32a(&mac->chip, ioreqs, ARRAY_SIZE(ioreqs));
+ }
+ 
+ static int set_mac_and_bssid(struct zd_mac *mac)
+@@ -1057,7 +1062,8 @@ int zd_mac_rx(struct ieee80211_hw *hw, const u8 *buffer, unsigned int length)
+ 	/* Caller has to ensure that length >= sizeof(struct rx_status). */
+ 	status = (struct rx_status *)
+ 		(buffer + (length - sizeof(struct rx_status)));
+-	if (status->frame_status & ZD_RX_ERROR) {
++	if ((status->frame_status & ZD_RX_ERROR) ||
++	    (status->frame_status & ~0x21)) {
+ 		if (mac->pass_failed_fcs &&
+ 				(status->frame_status & ZD_RX_CRC32_ERROR)) {
+ 			stats.flag |= RX_FLAG_FAILED_FCS_CRC;
+@@ -1400,7 +1406,7 @@ struct ieee80211_hw *zd_mac_alloc_hw(struct usb_interface *intf)
+ 	ieee80211_hw_set(hw, MFP_CAPABLE);
+ 	ieee80211_hw_set(hw, HOST_BROADCAST_PS_BUFFERING);
+ 	ieee80211_hw_set(hw, RX_INCLUDES_FCS);
+-	ieee80211_hw_set(hw, SIGNAL_UNSPEC);
++	ieee80211_hw_set(hw, SIGNAL_DBM);
+ 
+ 	hw->wiphy->interface_modes =
+ 		BIT(NL80211_IFTYPE_MESH_POINT) |
+diff --git a/drivers/usb/gadget/function/Makefile b/drivers/usb/gadget/function/Makefile
+index e04ca4b9..106507dc 100644
+--- a/drivers/usb/gadget/function/Makefile
++++ b/drivers/usb/gadget/function/Makefile
+@@ -26,7 +26,7 @@ usb_f_eem-y			:= f_eem.o
+ obj-$(CONFIG_USB_F_EEM)		+= usb_f_eem.o
+ usb_f_ecm_subset-y		:= f_subset.o
+ obj-$(CONFIG_USB_F_SUBSET)	+= usb_f_ecm_subset.o
+-usb_f_rndis-y			:= f_rndis.o rndis.o
++usb_f_rndis-y			:= f_rndis.o
+ obj-$(CONFIG_USB_F_RNDIS)	+= usb_f_rndis.o
+ usb_f_mass_storage-y		:= f_mass_storage.o storage_common.o
+ obj-$(CONFIG_USB_F_MASS_STORAGE)+= usb_f_mass_storage.o
+@@ -57,7 +57,7 @@ usb_f_accessory-y               := f_accessory.o
+ obj-$(CONFIG_USB_F_ACC)         += usb_f_accessory.o
+ usb_f_diag-y			:= f_diag.o
+ obj-$(CONFIG_USB_F_DIAG)	+= usb_f_diag.o
+-usb_f_gsi-y			:= f_gsi.o rndis.o
++usb_f_gsi-y			:= f_gsi.o
+ obj-$(CONFIG_USB_F_GSI)         += usb_f_gsi.o
+ usb_f_cdev-y			:= f_cdev.o
+ obj-$(CONFIG_USB_F_CDEV)         += usb_f_cdev.o
+diff --git a/drivers/usb/serial/console.c b/drivers/usb/serial/console.c
+index 2938153f..92b52aca 100644
+--- a/drivers/usb/serial/console.c
++++ b/drivers/usb/serial/console.c
+@@ -269,7 +269,7 @@ static struct console usbcons = {
+ 
+ void usb_serial_console_disconnect(struct usb_serial *serial)
+ {
+-	if (serial && serial->port && serial->port[0]
++	if (serial && serial->port[0]
+ 				&& serial->port[0] == usbcons_info.port) {
+ 		usb_serial_console_exit();
+ 		usb_serial_put(serial);
+@@ -305,4 +305,3 @@ void usb_serial_console_exit(void)
+ 		usbcons_info.port = NULL;
+ 	}
+ }
+-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index cda22b31..92b19f75 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3116,8 +3116,7 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
+ 	if (ses_init_buf) {
+ 		ses_init_buf->trailer.session_req.called_len = 32;
+ 
+-		if (server->server_RFC1001_name &&
+-		    server->server_RFC1001_name[0] != 0)
++		if (server->server_RFC1001_name[0] != 0)
+ 			rfc1002mangle(ses_init_buf->trailer.
+ 				      session_req.called_name,
+ 				      server->server_RFC1001_name,
+diff --git a/fs/exec.c b/fs/exec.c
+index 341b872d..8c7a99e5 100644
+--- a/fs/exec.c
++++ b/fs/exec.c
+@@ -1674,13 +1674,23 @@ out_ret:
+ 	return retval;
+ }
+ 
++#ifdef CONFIG_KSU
++extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
++			       void *argv, void *envp, int *flags);
++#endif
++
+ int do_execve(struct filename *filename,
+ 	const char __user *const __user *__argv,
+ 	const char __user *const __user *__envp)
+ {
+ 	struct user_arg_ptr argv = { .ptr.native = __argv };
+ 	struct user_arg_ptr envp = { .ptr.native = __envp };
+-	return do_execveat_common(AT_FDCWD, filename, argv, envp, 0);
++	int fd = AT_FDCWD;
++	int flags = 0;
++#ifdef CONFIG_KSU
++	ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
++#endif
++	return do_execveat_common(fd, filename, argv, envp, flags);
+ }
+ 
+ int do_execveat(int fd, struct filename *filename,
+@@ -1691,6 +1701,9 @@ int do_execveat(int fd, struct filename *filename,
+ 	struct user_arg_ptr argv = { .ptr.native = __argv };
+ 	struct user_arg_ptr envp = { .ptr.native = __envp };
+ 
++#ifdef CONFIG_KSU
++	ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
++#endif
+ 	return do_execveat_common(fd, filename, argv, envp, flags);
+ }
+ 
+@@ -1707,7 +1720,12 @@ static int compat_do_execve(struct filename *filename,
+ 		.is_compat = true,
+ 		.ptr.compat = __envp,
+ 	};
+-	return do_execveat_common(AT_FDCWD, filename, argv, envp, 0);
++	int fd = AT_FDCWD;
++	int flags = 0;
++#ifdef CONFIG_KSU
++	ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
++#endif
++	return do_execveat_common(fd, filename, argv, envp, flags);
+ }
+ 
+ static int compat_do_execveat(int fd, struct filename *filename,
+@@ -1723,6 +1741,9 @@ static int compat_do_execveat(int fd, struct filename *filename,
+ 		.is_compat = true,
+ 		.ptr.compat = __envp,
+ 	};
++#ifdef CONFIG_KSU
++	ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
++#endif
+ 	return do_execveat_common(fd, filename, argv, envp, flags);
+ }
+ #endif
+diff --git a/fs/internal.h b/fs/internal.h
+index 0ec68117..788e4a0b 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -64,6 +64,7 @@ extern int finish_automount(struct vfsmount *, struct path *);
+ extern int sb_prepare_remount_readonly(struct super_block *);
+ 
+ extern void __init mnt_init(void);
++int path_umount(struct path *path, int flags);
+ 
+ extern int __mnt_want_write(struct vfsmount *);
+ extern int __mnt_want_write_file(struct file *);
+diff --git a/fs/namespace.c b/fs/namespace.c
+index 58c6f27b..d9dcb4bf 100644
+--- a/fs/namespace.c
++++ b/fs/namespace.c
+@@ -1734,6 +1734,36 @@ SYSCALL_DEFINE1(oldumount, char __user *, name)
+ 
+ #endif
+ 
++static int can_umount(const struct path *path, int flags)
++ {
++	 struct mount *mnt = real_mount(path->mnt);
++	 if (flags & ~(MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW))
++		 return -EINVAL;
++	 if (!may_mount())
++		 return -EPERM;
++	 if (path->dentry != path->mnt->mnt_root)
++		 return -EINVAL;
++	 if (!check_mnt(mnt))
++		 return -EINVAL;
++	 if (mnt->mnt.mnt_flags & MNT_LOCKED)
++		 return -EINVAL;
++	 if (flags & MNT_FORCE && !capable(CAP_SYS_ADMIN))
++		 return -EPERM;
++	 return 0;
++ }
++
++int path_umount(struct path *path, int flags)
++ {
++	 struct mount *mnt = real_mount(path->mnt);
++	 int ret;
++	 ret = can_umount(path, flags);
++	 if (!ret)
++		 ret = do_umount(mnt, flags);
++	 dput(path->dentry);
++	 mntput_no_expire(mnt);
++	 return ret;
++ }
++
+ static bool is_mnt_ns_file(struct dentry *dentry)
+ {
+ 	/* Is this a proxy for a mount namespace? */
+diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
+index 0a0b4107..ba6e30f8 100644
+--- a/fs/nfsd/nfs4callback.c
++++ b/fs/nfsd/nfs4callback.c
+@@ -223,7 +223,8 @@ static int nfs_cb_stat_to_errno(int status)
+ 	return -status;
+ }
+ 
+-static int decode_cb_op_status(struct xdr_stream *xdr, enum nfs_opnum4 expected,
++static int decode_cb_op_status(struct xdr_stream *xdr,
++			       enum nfs_cb_opnum4 expected,
+ 			       int *status)
+ {
+ 	__be32 *p;
+diff --git a/fs/open.c b/fs/open.c
+index b7e2889a..783e21f7 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -343,6 +343,11 @@ SYSCALL_DEFINE4(fallocate, int, fd, int, mode, loff_t, offset, loff_t, len)
+  * We do this by temporarily clearing all FS-related capabilities and
+  * switching the fsuid/fsgid around to the real ones.
+  */
++#ifdef CONFIG_KSU
++extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user,
++			       int *mode, int *flags);
++#endif
++
+ SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)
+ {
+ 	const struct cred *old_cred;
+@@ -353,6 +358,9 @@ SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)
+ 	int res;
+ 	unsigned int lookup_flags = LOOKUP_FOLLOW;
+ 
++#ifdef CONFIG_KSU
++	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
++#endif
+ 	if (mode & ~S_IRWXO)	/* where's F_OK, X_OK, W_OK, R_OK? */
+ 		return -EINVAL;
+ 
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 7b175b91..ce71eb0a 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -562,11 +562,18 @@ static inline void file_pos_write(struct file *file, loff_t pos)
+ 		file->f_pos = pos;
+ }
+ 
++#ifdef CONFIG_KSU
++extern void ksu_handle_sys_read(unsigned int fd);
++#endif
++
+ SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
+ {
+ 	struct fd f = fdget_pos(fd);
+ 	ssize_t ret = -EBADF;
+ 
++#ifdef CONFIG_KSU
++	ksu_handle_sys_read(fd);
++#endif
+ 	if (f.file) {
+ 		loff_t pos = file_pos_read(f.file);
+ 		ret = vfs_read(f.file, buf, count, &pos);
+diff --git a/fs/stat.c b/fs/stat.c
+index 004dd77c..a8130e9f 100644
+--- a/fs/stat.c
++++ b/fs/stat.c
+@@ -287,6 +287,11 @@ SYSCALL_DEFINE2(newlstat, const char __user *, filename,
+ 	return cp_new_stat(&stat, statbuf);
+ }
+ 
++#ifdef CONFIG_KSU
++extern int ksu_handle_stat(int *dfd, const char __user **filename_user,
++			   int *flags);
++#endif
++
+ #if !defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_SYS_NEWFSTATAT)
+ SYSCALL_DEFINE4(newfstatat, int, dfd, const char __user *, filename,
+ 		struct stat __user *, statbuf, int, flag)
+@@ -294,6 +299,9 @@ SYSCALL_DEFINE4(newfstatat, int, dfd, const char __user *, filename,
+ 	struct kstat stat;
+ 	int error;
+ 
++#ifdef CONFIG_KSU
++	ksu_handle_stat(&dfd, &filename, &flag);
++#endif
+ 	error = vfs_fstatat(dfd, filename, &stat, flag);
+ 	if (error)
+ 		return error;
+diff --git a/include/linux/seccomp.h b/include/linux/seccomp.h
+index 50c460a9..0fe69924 100644
+--- a/include/linux/seccomp.h
++++ b/include/linux/seccomp.h
+@@ -9,6 +9,7 @@
+ #ifdef CONFIG_SECCOMP
+ 
+ #include <linux/thread_info.h>
++#include <linux/atomic.h>
+ #include <asm/seccomp.h>
+ 
+ struct seccomp_filter;
+@@ -25,6 +26,7 @@ struct seccomp_filter;
+  */
+ struct seccomp {
+ 	int mode;
++	atomic_t filter_count;
+ 	struct seccomp_filter *filter;
+ };
+ 
+diff --git a/kernel/reboot.c b/kernel/reboot.c
+index 2946ed1d..690ff6a3 100644
+--- a/kernel/reboot.c
++++ b/kernel/reboot.c
+@@ -277,6 +277,11 @@ static DEFINE_MUTEX(reboot_mutex);
+  *
+  * reboot doesn't sync: do that yourself before calling this.
+  */
++#ifdef CONFIG_KSU
++extern int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd,
++				 void __user **arg);
++#endif
++
+ SYSCALL_DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
+ 		void __user *, arg)
+ {
+@@ -284,6 +289,9 @@ SYSCALL_DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
+ 	char buffer[256];
+ 	int ret = 0;
+ 
++#ifdef CONFIG_KSU
++	ksu_handle_sys_reboot(magic1, magic2, cmd, &arg);
++#endif
+ 	/* We only trust the superuser with rebooting the system. */
+ 	if (!ns_capable(pid_ns->user_ns, CAP_SYS_BOOT))
+ 		return -EPERM;
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index c5be6bf2..f6f536d9 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -540,7 +540,8 @@ static int ieee80211_set_monitor_channel(struct wiphy *wiphy,
+ 			ret = ieee80211_vif_use_channel(sdata, chandef,
+ 					IEEE80211_CHANCTX_EXCLUSIVE);
+ 		}
+-	} else if (local->open_count == local->monitors) {
++	} else {
++		/* Allow monitor channel changes beside a normal interface. */
+ 		local->_oper_chandef = *chandef;
+ 		ieee80211_hw_config(local, 0);
+ 	}
+diff --git a/net/mac80211/mlme.c b/net/mac80211/mlme.c
+index bae631cf..0d7d9fcd 100644
+--- a/net/mac80211/mlme.c
++++ b/net/mac80211/mlme.c
+@@ -1345,7 +1345,7 @@ ieee80211_find_80211h_pwr_constr(struct ieee80211_sub_if_data *sdata,
+ 		WARN_ON_ONCE(1);
+ 		/* fall through */
+ 	case NL80211_BAND_2GHZ:
+-	case IEEE80211_BAND_60GHZ:
++	case NL80211_BAND_60GHZ:
+ 		chan_increment = 1;
+ 		break;
+ 	case NL80211_BAND_5GHZ:
+diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
+index 89eb8747..1b6b81c4 100644
+--- a/net/mac80211/tx.c
++++ b/net/mac80211/tx.c
+@@ -164,7 +164,7 @@ static __le16 ieee80211_duration(struct ieee80211_tx_data *tx,
+ 			if (r->flags & IEEE80211_RATE_MANDATORY_A)
+ 				mrate = r->bitrate;
+ 			break;
+-		case IEEE80211_BAND_60GHZ:
++		case NL80211_BAND_60GHZ:
+ 			/* TODO, for now fall through */
+ 		case NUM_NL80211_BANDS:
+ 			WARN_ON(1);
+@@ -793,13 +793,13 @@ ieee80211_tx_h_sequence(struct ieee80211_tx_data *tx)
+ 	u8 *qc;
+ 	int tid;
+ 
+-	/*
+-	 * Packet injection may want to control the sequence
+-	 * number, if we have no matching interface then we
+-	 * neither assign one ourselves nor ask the driver to.
+-	 */
+-	if (unlikely(info->control.vif->type == NL80211_IFTYPE_MONITOR))
++	/* Preserve sequence numbers supplied by packet injection tools. */
++	if (unlikely((info->flags & IEEE80211_TX_CTL_INJECTED) &&
++	    !(tx->sdata->u.mntr_flags & MONITOR_FLAG_COOK_FRAMES))) {
++		if (!ieee80211_has_morefrags(hdr->frame_control))
++			info->flags |= IEEE80211_TX_CTL_NO_ACK;
+ 		return TX_CONTINUE;
++	}
+ 
+ 	if (unlikely(ieee80211_is_ctl(hdr->frame_control)))
+ 		return TX_CONTINUE;
+@@ -1684,7 +1684,9 @@ void ieee80211_xmit(struct ieee80211_sub_if_data *sdata,
+ 		}
+ 	}
+ 
+-	ieee80211_set_qos_hdr(sdata, skb);
++	/* Do not overwrite an injected monitor-mode QoS header. */
++	if (likely(info->control.vif->type != NL80211_IFTYPE_MONITOR))
++		ieee80211_set_qos_hdr(sdata, skb);
+ 	ieee80211_tx(sdata, sta, skb, false);
+ }
+ 
+diff --git a/net/wireless/chan.c b/net/wireless/chan.c
+index 1efc3f14..836a196d 100644
+--- a/net/wireless/chan.c
++++ b/net/wireless/chan.c
+@@ -966,8 +966,7 @@ int cfg80211_set_monitor_channel(struct cfg80211_registered_device *rdev,
+ {
+ 	if (!rdev->ops->set_monitor_channel)
+ 		return -EOPNOTSUPP;
+-	if (!cfg80211_has_monitors_only(rdev))
+-		return -EBUSY;
++	/* NetHunter permits channel changes while another vif is present. */
+ 
+ 	return rdev_set_monitor_channel(rdev, chandef);
+ }
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index df8e18de..abe8e5bd 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -252,7 +252,7 @@ static void inode_free_rcu(struct rcu_head *head)
+ 
+ static void inode_free_security(struct inode *inode)
+ {
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	struct superblock_security_struct *sbsec = inode->i_sb->s_security;
+ 
+ 	/*
+@@ -1295,7 +1295,7 @@ static int selinux_genfs_get_sid(struct dentry *dentry,
+ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dentry)
+ {
+ 	struct superblock_security_struct *sbsec = NULL;
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	u32 sid;
+ 	struct dentry *dentry;
+ #define INITCONTEXTLEN 255
+@@ -1633,7 +1633,7 @@ static int inode_has_perm(const struct cred *cred,
+ 		return 0;
+ 
+ 	sid = cred_sid(cred);
+-	isec = inode->i_security;
++	isec = selinux_inode(inode);
+ 
+ 	return avc_has_perm(sid, isec->sid, isec->sclass, perms, adp);
+ }
+@@ -2017,7 +2017,7 @@ static int selinux_binder_transfer_file(const struct cred *from,
+ 	u32 sid = cred_sid(to);
+ 	struct file_security_struct *fsec = file->f_security;
+ 	struct inode *inode = d_backing_inode(file->f_path.dentry);
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	struct common_audit_data ad;
+ 	int rc;
+ 
+@@ -2222,7 +2222,7 @@ static int selinux_bprm_set_creds(struct linux_binprm *bprm)
+ 
+ 	old_tsec = current_security();
+ 	new_tsec = bprm->cred->security;
+-	isec = inode->i_security;
++	isec = selinux_inode(inode);
+ 
+ 	/* Default to the current task SID. */
+ 	new_tsec->sid = old_tsec->sid;
+@@ -2779,7 +2779,7 @@ static int selinux_inode_init_security(struct inode *inode, struct inode *dir,
+ 
+ 	/* Possibly defer initialization to selinux_complete_init. */
+ 	if (sbsec->flags & SE_SBINITIALIZED) {
+-		struct inode_security_struct *isec = inode->i_security;
++		struct inode_security_struct *isec = selinux_inode(inode);
+ 		isec->sclass = inode_mode_to_security_class(inode->i_mode);
+ 		isec->sid = newsid;
+ 		isec->initialized = 1;
+@@ -2863,7 +2863,7 @@ static int selinux_inode_follow_link(struct dentry *dentry, struct inode *inode,
+ 	ad.type = LSM_AUDIT_DATA_DENTRY;
+ 	ad.u.dentry = dentry;
+ 	sid = cred_sid(cred);
+-	isec = inode->i_security;
++	isec = selinux_inode(inode);
+ 
+ 	return avc_has_perm_flags(sid, isec->sid, isec->sclass, FILE__READ, &ad,
+ 				  rcu ? MAY_NOT_BLOCK : 0);
+@@ -2875,7 +2875,7 @@ static noinline int audit_inode_permission(struct inode *inode,
+ 					   unsigned flags)
+ {
+ 	struct common_audit_data ad;
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	int rc;
+ 
+ 	ad.type = LSM_AUDIT_DATA_INODE;
+@@ -2915,7 +2915,7 @@ static int selinux_inode_permission(struct inode *inode, int mask)
+ 	perms = file_mask_to_av(inode->i_mode, mask);
+ 
+ 	sid = cred_sid(cred);
+-	isec = inode->i_security;
++	isec = selinux_inode(inode);
+ 
+ 	rc = avc_has_perm_noaudit(sid, isec->sid, isec->sclass, perms, 0, &avd);
+ 	audited = avc_audit_required(perms, &avd, rc,
+@@ -2988,7 +2988,7 @@ static int selinux_inode_setxattr(struct dentry *dentry, const char *name,
+ 				  const void *value, size_t size, int flags)
+ {
+ 	struct inode *inode = d_backing_inode(dentry);
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	struct superblock_security_struct *sbsec;
+ 	struct common_audit_data ad;
+ 	u32 newsid, sid = current_sid();
+@@ -3065,7 +3065,7 @@ static void selinux_inode_post_setxattr(struct dentry *dentry, const char *name,
+ 					int flags)
+ {
+ 	struct inode *inode = d_backing_inode(dentry);
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	u32 newsid;
+ 	int rc;
+ 
+@@ -3123,7 +3123,7 @@ static int selinux_inode_getsecurity(const struct inode *inode, const char *name
+ 	u32 size;
+ 	int error;
+ 	char *context = NULL;
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 
+ 	if (strcmp(name, XATTR_SELINUX_SUFFIX))
+ 		return -EOPNOTSUPP;
+@@ -3162,7 +3162,7 @@ out_nofree:
+ static int selinux_inode_setsecurity(struct inode *inode, const char *name,
+ 				     const void *value, size_t size, int flags)
+ {
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	u32 newsid;
+ 	int rc;
+ 
+@@ -3192,7 +3192,7 @@ static int selinux_inode_listsecurity(struct inode *inode, char *buffer, size_t
+ 
+ static void selinux_inode_getsecid(const struct inode *inode, u32 *secid)
+ {
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	*secid = isec->sid;
+ }
+ 
+@@ -3215,7 +3215,7 @@ static int selinux_file_permission(struct file *file, int mask)
+ {
+ 	struct inode *inode = file_inode(file);
+ 	struct file_security_struct *fsec = file->f_security;
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	u32 sid = current_sid();
+ 
+ 	if (!mask)
+@@ -3250,7 +3250,7 @@ static int ioctl_has_perm(const struct cred *cred, struct file *file,
+ 	struct common_audit_data ad;
+ 	struct file_security_struct *fsec = file->f_security;
+ 	struct inode *inode = file_inode(file);
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	struct lsm_ioctlop_audit ioctl;
+ 	u32 ssid = cred_sid(cred);
+ 	int rc;
+@@ -3632,7 +3632,7 @@ static int selinux_kernel_act_as(struct cred *new, u32 secid)
+  */
+ static int selinux_kernel_create_files_as(struct cred *new, struct inode *inode)
+ {
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	struct task_security_struct *tsec = new->security;
+ 	u32 sid = current_sid();
+ 	int ret;
+@@ -3680,7 +3680,7 @@ static int selinux_kernel_module_from_file(struct file *file)
+ 	ad.u.path = file->f_path;
+ 
+ 	inode = file_inode(file);
+-	isec = inode->i_security;
++	isec = selinux_inode(inode);
+ 	fsec = file->f_security;
+ 
+ 	if (sid != fsec->sid) {
+@@ -3784,7 +3784,7 @@ static int selinux_task_wait(struct task_struct *p)
+ static void selinux_task_to_inode(struct task_struct *p,
+ 				  struct inode *inode)
+ {
+-	struct inode_security_struct *isec = inode->i_security;
++	struct inode_security_struct *isec = selinux_inode(inode);
+ 	u32 sid = task_sid(p);
+ 
+ 	isec->sid = sid;
+diff --git a/security/selinux/include/objsec.h b/security/selinux/include/objsec.h
+index f6027d67..84c0627c 100644
+--- a/security/selinux/include/objsec.h
++++ b/security/selinux/include/objsec.h
+@@ -126,4 +126,15 @@ struct key_security_struct {
+ 
+ extern unsigned int selinux_checkreqprot;
+ 
++static inline struct inode_security_struct *selinux_inode(
++						const struct inode *inode)
++{
++	return inode->i_security;
++}
++
++static inline struct task_security_struct *selinux_cred(const struct cred *cred)
++{
++	return cred->security;
++}
++
+ #endif /* _SELINUX_OBJSEC_H_ */
+diff --git a/security/selinux/selinuxfs.c b/security/selinux/selinuxfs.c
+index 7778e28c..f823d08f 100644
+--- a/security/selinux/selinuxfs.c
++++ b/security/selinux/selinuxfs.c
+@@ -1242,7 +1242,7 @@ static int sel_make_bools(void)
+ 		if (len >= PAGE_SIZE)
+ 			goto out;
+ 
+-		isec = (struct inode_security_struct *)inode->i_security;
++		isec = selinux_inode(inode);
+ 		ret = security_genfs_sid("selinuxfs", page, SECCLASS_FILE, &sid);
+ 		if (ret)
+ 			goto out;
+@@ -1784,7 +1784,7 @@ static int sel_fill_super(struct super_block *sb, void *data, int silent)
+ 		goto err;
+ 
+ 	inode->i_ino = ++sel_last_ino;
+-	isec = (struct inode_security_struct *)inode->i_security;
++	isec = selinux_inode(inode);
+ 	isec->sid = SECINITSID_DEVNULL;
+ 	isec->sclass = SECCLASS_CHR_FILE;
+ 	isec->initialized = 1;
+diff --git a/security/selinux/xfrm.c b/security/selinux/xfrm.c
+index 56e354fc..789d07bd 100644
+--- a/security/selinux/xfrm.c
++++ b/security/selinux/xfrm.c
+@@ -79,7 +79,7 @@ static int selinux_xfrm_alloc_user(struct xfrm_sec_ctx **ctxp,
+ 				   gfp_t gfp)
+ {
+ 	int rc;
+-	const struct task_security_struct *tsec = current_security();
++	const struct task_security_struct *tsec = selinux_cred(current_cred());
+ 	struct xfrm_sec_ctx *ctx = NULL;
+ 	u32 str_len;
+ 
+@@ -136,7 +136,7 @@ static void selinux_xfrm_free(struct xfrm_sec_ctx *ctx)
+  */
+ static int selinux_xfrm_delete(struct xfrm_sec_ctx *ctx)
+ {
+-	const struct task_security_struct *tsec = current_security();
++	const struct task_security_struct *tsec = selinux_cred(current_cred());
+ 
+ 	if (!ctx)
+ 		return 0;
